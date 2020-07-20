@@ -1,0 +1,10 @@
+gradlePlugin {
+    testSourceSets sourceSets.functionalTest
+
+    plugins {
+        CommonGradleBaseline {
+            id = 'com.jrmcdonald.common.ms-gradle-baseline'
+            implementationClass = 'com.jrmcdonald.common.baseline.plugin.BaselinePlugin'
+        }
+    }
+}
