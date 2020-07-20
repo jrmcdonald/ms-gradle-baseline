@@ -1,7 +1,6 @@
 plugins {
     id 'java-gradle-plugin'
     id 'maven-publish'
-    id 'com.gradle.plugin-publish' version "${gradlePublishPluginVersion}"
 }
 
 group = 'com.jrmcdonald'
