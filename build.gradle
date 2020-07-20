@@ -1,0 +1,67 @@
+plugins {
+    id 'java-gradle-plugin'
+    id 'maven-publish'
+    id 'com.gradle.plugin-publish' version "${gradlePublishPluginVersion}"
+}
+
+group = 'com.jrmcdonald'
+version = "${version}"
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+    gradlePluginPortal()
+    maven {
+        url = 'https://maven.pkg.github.com/jrmcdonald/ms-common'
+        credentials {
+            username = "jrmcdonald"
+            password = project.findProperty('GITHUB_TOKEN') ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+}
+
+apply from: "${rootDir}/gradle/functional.gradle"
+apply from: "${rootDir}/gradle/plugin.gradle"
+
+configurations {
+    commonPlatform
+    compileOnly.extendsFrom(commonPlatform)
+    annotationProcessor.extendsFrom(commonPlatform)
+    testCompileOnly.extendsFrom(commonPlatform)
+    testAnnotationProcessor.extendsFrom(commonPlatform)
+    functionalTestCompileOnly.extendsFrom(commonPlatform)
+    functionalTestAnnotationProcessor.extendsFrom(commonPlatform)
+    implementation.extendsFrom(commonPlatform)
+    testFixturesImplementation.extendsFrom(commonPlatform)
+}
+
+dependencies {
+    commonPlatform enforcedPlatform(group: 'com.jrmcdonald', name: 'ms-common-bom', version: "${commonPlatformVersion}")
+
+    compileOnly group: 'org.projectlombok', name: 'lombok'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok'
+
+    // Plugin Dependencies
+    implementation group: 'gradle.plugin.com.github.spotbugs.snom', name: 'spotbugs-gradle-plugin', version: "${spotbugsPluginVersion}"
+    implementation group: 'gradle.plugin.com.gtramontina.ghooks.gradle', name: 'ghooks.gradle', version: "${ghooksPluginVersion}"
+    implementation group: 'com.github.ben-manes', name: 'gradle-versions-plugin', version: "${versionsPluginVersion}"
+    implementation group: 'org.owasp', name: 'dependency-check-gradle', version: "${dependencyCheckPluginVersion}"
+    implementation group: 'org.sonarsource.scanner.gradle', name: 'sonarqube-gradle-plugin', version: "${sonarqubePluginVersion}"
+    implementation group: 'org.springframework.boot', name: 'spring-boot-gradle-plugin', version: "${springbootPluginVersion}"
+
+    testImplementation group: 'org.assertj', name: 'assertj-core'
+    testImplementation group: 'org.force66', name: 'BeanTester'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
+    testImplementation group: 'org.mockito', name: 'mockito-core'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter'
+
+    functionalTestCompileOnly group: 'org.projectlombok', name: 'lombok'
+    functionalTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
+
+    functionalTestImplementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: "${jgitVersion}"
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+}
