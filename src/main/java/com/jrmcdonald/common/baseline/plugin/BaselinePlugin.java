@@ -19,25 +19,24 @@ public class BaselinePlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        var manager = List.of(DependencyCheckPluginManager.class,
-                              GitHooksPluginManager.class,
-                              JacocoPluginManager.class,
-                              SonarQubePluginManager.class,
-                              SpotBugsPluginManager.class,
-                              SpringBootPluginManager.class,
-                              VersionsPluginManager.class);
+        var managers = List.of(new DependencyCheckPluginManager(),
+                               new GitHooksPluginManager(),
+                               new JacocoPluginManager(),
+                               new SonarQubePluginManager(),
+                               new SpotBugsPluginManager(),
+                               new SpringBootPluginManager(),
+                               new VersionsPluginManager());
 
-        applyToProjectWithManagers(project, manager);
+        applyToProjectWithManagers(project, managers);
     }
 
-    public static void applyToProjectWithManagers(Project project, List<Class<? extends PluginManager>> managers) {
+    public static void applyToProjectWithManagers(Project project, List<? extends PluginManager> managers) {
         var root = project.getRootProject();
         if (!project.equals(root)) {
             throw new InvalidProjectTargetException("com.jrmcdonald.common.baseline should be applied to the root project only");
         }
 
-        root.allprojects(p -> managers.forEach(manager -> p.getPlugins()
-                                                           .apply(manager)));
+        managers.forEach(manager -> root.allprojects(manager::apply));
     }
 
 }

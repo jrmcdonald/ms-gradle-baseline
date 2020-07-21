@@ -12,18 +12,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class VersionsPluginManagerTest {
 
+    private VersionsPluginManager manager;
     private Project project;
 
     @BeforeEach
     void beforeEach() {
+        manager = new VersionsPluginManager();
         project = ProjectBuilder.builder().build();
-        project.getPlugins().apply(VersionsPluginManager.class);
+
+        manager.apply(project);
     }
 
     @Test
     @DisplayName("Should apply plugins to project")
     void shouldApplyPluginsToProject() {
-        assertThat(project.getPlugins().hasPlugin(VersionsPluginManager.class)).isTrue();
         assertThat(project.getPlugins().hasPlugin(VersionsPlugin.class)).isTrue();
     }
 

@@ -1,11 +1,9 @@
 package com.jrmcdonald.common.baseline.manager;
 
-import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
-public interface PluginManager extends Plugin<Project> {
+public interface PluginManager {
 
-    @Override
     default void apply(Project project) {}
 
 }
