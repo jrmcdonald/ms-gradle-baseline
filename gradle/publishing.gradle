@@ -1,12 +1,18 @@
-publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/jrmcdonald/ms-common")
-            credentials {
-                username = "jrmcdonald"
-                password = System.getenv("GITHUB_TOKEN")
-            }
+pluginBundle {
+    website = 'https://github.com/jrmcdonald/ms-gradle-baseline'
+    vcsUrl = 'https://github.com/jrmcdonald/ms-gradle-baseline'
+    tags = ['gradle', 'spring-boot', 'baseline']
+}
+
+gradlePlugin {
+    testSourceSets sourceSets.functionalTest
+
+    plugins {
+        commonGradleBaselinePlugin {
+            id = 'com.jrmcdonald.ms-gradle-baseline'
+            displayName = 'Common Gradle Baseline Plugin'
+            description = 'Plugin to apply a common gradle configuration to Spring Boot microservices'
+            implementationClass = 'com.jrmcdonald.common.baseline.plugin.BaselinePlugin'
         }
     }
 }

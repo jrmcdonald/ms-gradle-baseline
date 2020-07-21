@@ -1,27 +1,28 @@
 plugins {
     id 'java-gradle-plugin'
-    id 'maven-publish'
+    id 'com.gradle.plugin-publish' version "${gradlePluginPublishPluginVersion}"
 }
 
 group = 'com.jrmcdonald'
 version = "${version}"
 
+ext['gradle.publish.key'] = System.getenv("GRADLE_PUBLISH_KEY")
+ext['gradle.publish.secret'] = System.getenv("GRADLE_PUBLISH_SECRET")
+
 repositories {
-    mavenLocal()
     mavenCentral()
-    jcenter()
     gradlePluginPortal()
     maven {
         url = 'https://maven.pkg.github.com/jrmcdonald/ms-common'
         credentials {
             username = "jrmcdonald"
-            password = project.findProperty('GITHUB_TOKEN') ?: System.getenv("GITHUB_TOKEN")
+            password = System.getenv("GITHUB_TOKEN")
         }
     }
 }
 
-apply from: "${rootDir}/gradle/functional.gradle"
-apply from: "${rootDir}/gradle/plugin.gradle"
+apply from: "${rootDir}/gradle/functional-test.gradle"
+apply from: "${rootDir}/gradle/publishing.gradle"
 
 configurations {
     commonPlatform
