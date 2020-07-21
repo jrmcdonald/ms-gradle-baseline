@@ -50,10 +50,6 @@ class BaselinePluginTest {
 
     public static class TestPluginConfigurer implements PluginManager {
 
-        @Override
-        public void apply(Project project) {
-            // do nothing intentionally
-        }
     }
 
 }
