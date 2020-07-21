@@ -1,4 +1,4 @@
-package com.jrmcdonald.common.baseline.configurer;
+package com.jrmcdonald.common.baseline.manager;
 
 import com.github.benmanes.gradle.versions.VersionsPlugin;
 
@@ -10,20 +10,20 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class VersionsPluginConfigurerTest {
+class VersionsPluginManagerTest {
 
     private Project project;
 
     @BeforeEach
     void beforeEach() {
         project = ProjectBuilder.builder().build();
-        project.getPlugins().apply(VersionsPluginConfigurer.class);
+        project.getPlugins().apply(VersionsPluginManager.class);
     }
 
     @Test
     @DisplayName("Should apply plugins to project")
     void shouldApplyPluginsToProject() {
-        assertThat(project.getPlugins().hasPlugin(VersionsPluginConfigurer.class)).isTrue();
+        assertThat(project.getPlugins().hasPlugin(VersionsPluginManager.class)).isTrue();
         assertThat(project.getPlugins().hasPlugin(VersionsPlugin.class)).isTrue();
     }
 

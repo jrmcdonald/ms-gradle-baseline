@@ -1,4 +1,4 @@
-package com.jrmcdonald.common.baseline.configurer;
+package com.jrmcdonald.common.baseline.manager;
 
 import com.jrmcdonald.common.baseline.AbstractGradleFunctionalTest;
 

@@ -1,4 +1,4 @@
-package com.jrmcdonald.common.baseline.configurer;
+package com.jrmcdonald.common.baseline.manager;
 
 import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
@@ -9,20 +9,20 @@ import org.owasp.dependencycheck.gradle.DependencyCheckPlugin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class DependencyCheckPluginConfigurerTest {
+class DependencyCheckPluginManagerTest {
 
     private Project project;
 
     @BeforeEach
     void beforeEach() {
         project = ProjectBuilder.builder().build();
-        project.getPlugins().apply(DependencyCheckPluginConfigurer.class);
+        project.getPlugins().apply(DependencyCheckPluginManager.class);
     }
 
     @Test
     @DisplayName("Should apply plugins to project")
     void shouldApplyPluginsToProject() {
-        assertThat(project.getPlugins().hasPlugin(DependencyCheckPluginConfigurer.class)).isTrue();
+        assertThat(project.getPlugins().hasPlugin(DependencyCheckPluginManager.class)).isTrue();
         assertThat(project.getPlugins().hasPlugin(DependencyCheckPlugin.class)).isTrue();
     }
 }

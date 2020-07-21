@@ -1,4 +1,4 @@
-package com.jrmcdonald.common.baseline.configurer;
+package com.jrmcdonald.common.baseline.manager;
 
 import com.github.spotbugs.snom.SpotBugsPlugin;
 
@@ -8,16 +8,16 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SpotBugsPluginConfigurerTest {
+class SpotBugsPluginManagerTest {
 
     @Test
     @DisplayName("Should apply plugins to java projects")
     void shouldApplyPluginsToJavaProjects() {
         var project = ProjectBuilder.builder().build();
         project.getPlugins().apply("java");
-        project.getPlugins().apply(SpotBugsPluginConfigurer.class);
+        project.getPlugins().apply(SpotBugsPluginManager.class);
 
-        assertThat(project.getPlugins().hasPlugin(SpotBugsPluginConfigurer.class)).isTrue();
+        assertThat(project.getPlugins().hasPlugin(SpotBugsPluginManager.class)).isTrue();
         assertThat(project.getPlugins().hasPlugin(SpotBugsPlugin.class)).isTrue();
     }
 
@@ -25,9 +25,9 @@ class SpotBugsPluginConfigurerTest {
     @DisplayName("Should not apply expected plugins to non java projects")
     void shouldNotApplyPluginsToNonJavaProjects() {
         var project = ProjectBuilder.builder().build();
-        project.getPlugins().apply(SpotBugsPluginConfigurer.class);
+        project.getPlugins().apply(SpotBugsPluginManager.class);
 
-        assertThat(project.getPlugins().hasPlugin(SpotBugsPluginConfigurer.class)).isTrue();
+        assertThat(project.getPlugins().hasPlugin(SpotBugsPluginManager.class)).isTrue();
         assertThat(project.getPlugins().hasPlugin(SpotBugsPlugin.class)).isFalse();
     }
 

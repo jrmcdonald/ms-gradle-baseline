@@ -1,4 +1,4 @@
-package com.jrmcdonald.common.baseline.configurer;
+package com.jrmcdonald.common.baseline.manager;
 
 import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.DisplayName;
@@ -7,16 +7,16 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SpringBootPluginConfigurerTest {
+class SpringBootPluginManagerTest {
 
     @Test
     @DisplayName("Should apply plugins to java projects")
     void shouldApplyPluginsToJavaProjects() {
         var project = ProjectBuilder.builder().build();
         project.getPlugins().apply("java");
-        project.getPlugins().apply(SpringBootPluginConfigurer.class);
+        project.getPlugins().apply(SpringBootPluginManager.class);
 
-        assertThat(project.getPlugins().hasPlugin(SpringBootPluginConfigurer.class)).isTrue();
+        assertThat(project.getPlugins().hasPlugin(SpringBootPluginManager.class)).isTrue();
         assertThat(project.getPlugins().hasPlugin(SpringBootPlugin.class)).isTrue();
     }
 
@@ -24,9 +24,9 @@ class SpringBootPluginConfigurerTest {
     @DisplayName("Should not apply expected plugins to non java projects")
     void shouldNotApplyPluginsToNonJavaProjects() {
         var project = ProjectBuilder.builder().build();
-        project.getPlugins().apply(SpringBootPluginConfigurer.class);
+        project.getPlugins().apply(SpringBootPluginManager.class);
 
-        assertThat(project.getPlugins().hasPlugin(SpringBootPluginConfigurer.class)).isTrue();
+        assertThat(project.getPlugins().hasPlugin(SpringBootPluginManager.class)).isTrue();
         assertThat(project.getPlugins().hasPlugin(SpringBootPlugin.class)).isFalse();
     }
 }

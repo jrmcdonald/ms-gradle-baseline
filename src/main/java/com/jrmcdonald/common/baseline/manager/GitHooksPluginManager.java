@@ -1,10 +1,10 @@
-package com.jrmcdonald.common.baseline.configurer;
+package com.jrmcdonald.common.baseline.manager;
 
 import com.gtramontina.ghooks.GHooks;
 
 import org.gradle.api.Project;
 
-public class GitHooksPluginConfigurer implements PluginConfigurer {
+public class GitHooksPluginManager implements PluginManager {
 
     @Override
     public void apply(Project project) {

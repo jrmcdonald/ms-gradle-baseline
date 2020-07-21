@@ -1,9 +1,9 @@
-package com.jrmcdonald.common.baseline.configurer;
+package com.jrmcdonald.common.baseline.manager;
 
 import org.gradle.api.Project;
 import org.sonarqube.gradle.SonarQubePlugin;
 
-public class SonarQubePluginConfigurer implements PluginConfigurer {
+public class SonarQubePluginManager implements PluginManager {
 
     @Override
     public void apply(Project project) {
