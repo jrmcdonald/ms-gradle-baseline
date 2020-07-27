@@ -15,6 +15,6 @@ public class SpringBootPluginFunctionalTest extends AbstractGradleFunctionalTest
         var result = build("bootRun", "-m");
 
         assertThat(result.getOutput()).contains(":bootRun SKIPPED")
-                                      .contains("BUILD SUCCESSFUL");
+                                      .contains(BUILD_SUCCESSFUL);
     }
 }
