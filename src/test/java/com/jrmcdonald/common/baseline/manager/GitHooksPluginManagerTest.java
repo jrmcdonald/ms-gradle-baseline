@@ -14,13 +14,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class GitHooksPluginManagerTest {
 
-    private GitHooksPluginManager manager;
-    Project rootProject;
-    Project subProject;
+    private Project rootProject;
+    private Project subProject;
 
     @BeforeEach
     void beforeEach() {
-        manager = new GitHooksPluginManager();
+        var manager = new GitHooksPluginManager();
         rootProject = ProjectBuilder.builder().withName("rootProject").build();
         subProject = ProjectBuilder.builder().withName("subProject").withParent(rootProject).build();
 

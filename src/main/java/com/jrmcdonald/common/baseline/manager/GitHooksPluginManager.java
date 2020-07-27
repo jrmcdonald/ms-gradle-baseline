@@ -4,6 +4,8 @@ import com.gtramontina.ghooks.GHooks;
 
 import org.gradle.api.Project;
 
+import static com.jrmcdonald.common.baseline.util.ProjectUtils.isRootProject;
+
 public class GitHooksPluginManager implements PluginManager {
 
     @Override
@@ -12,7 +14,7 @@ public class GitHooksPluginManager implements PluginManager {
     }
 
     private void applyToRootProject(Project project) {
-        if (project.equals(project.getRootProject())) {
+        if (isRootProject(project)) {
             project.getPlugins().apply(GHooks.class);
         }
     }

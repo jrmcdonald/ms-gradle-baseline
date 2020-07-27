@@ -16,6 +16,6 @@ public class GitHooksPluginFunctionalTest extends AbstractGradleFunctionalTest {
 
         assertThat(result.getOutput()).doesNotContain("Something went wrong while installing your Git hooks")
                                       .contains(":installGitHooks SKIPPED")
-                                      .contains("BUILD SUCCESSFUL");
+                                      .contains(BUILD_SUCCESSFUL);
     }
 }
