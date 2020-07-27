@@ -4,6 +4,6 @@ import org.gradle.api.Project;
 
 public interface PluginManager {
 
-    default void apply(Project project) {}
+    void apply(Project project);
 
 }
