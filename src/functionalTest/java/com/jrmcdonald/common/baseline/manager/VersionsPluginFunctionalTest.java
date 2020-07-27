@@ -15,6 +15,15 @@ public class VersionsPluginFunctionalTest extends AbstractGradleFunctionalTest {
         var result = build("dependencyUpdates", "-m");
 
         assertThat(result.getOutput()).contains(":dependencyUpdates SKIPPED")
-                                      .contains("BUILD SUCCESSFUL");
+                                      .contains(BUILD_SUCCESSFUL);
+    }
+
+    @Test
+    @DisplayName("Executing the `check` task executes the `dependencyUpdates` task")
+    void executingTheCheckTaskExecutesTheDependencyUpdatesTask() {
+        var result = build("check", "-m");
+
+        assertThat(result.getOutput()).contains(":dependencyUpdates SKIPPED")
+                                      .contains(BUILD_SUCCESSFUL);
     }
 }
