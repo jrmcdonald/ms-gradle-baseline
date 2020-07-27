@@ -15,6 +15,6 @@ public class SonarQubePluginFunctionalTest extends AbstractGradleFunctionalTest 
         var result = build("sonarqube", "-m");
 
         assertThat(result.getOutput()).contains(":sonarqube SKIPPED")
-                                      .contains("BUILD SUCCESSFUL");
+                                      .contains(BUILD_SUCCESSFUL);
     }
 }
