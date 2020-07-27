@@ -15,6 +15,6 @@ public class SpotBugsPluginFunctionalTest extends AbstractGradleFunctionalTest {
         var result = build("spotbugsMain", "-m");
 
         assertThat(result.getOutput()).contains(":spotbugsMain SKIPPED")
-                                      .contains("BUILD SUCCESSFUL");
+                                      .contains(BUILD_SUCCESSFUL);
     }
 }
