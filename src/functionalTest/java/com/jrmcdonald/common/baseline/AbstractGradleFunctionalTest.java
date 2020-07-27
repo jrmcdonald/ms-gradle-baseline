@@ -1,5 +1,6 @@
 package com.jrmcdonald.common.baseline;
 
+import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
@@ -16,6 +17,7 @@ public abstract class AbstractGradleFunctionalTest {
 
     private static final String SETTINGS_TEMPLATE_FILE = "src/functionalTest/resources/settings.gradle";
     private static final String GRADLE_TEMPLATE_FILE = "src/functionalTest/resources/build.gradle";
+    protected static final String BUILD_SUCCESSFUL = "BUILD SUCCESSFUL";
 
     @TempDir
     protected File projectDir;
@@ -35,8 +37,9 @@ public abstract class AbstractGradleFunctionalTest {
 
     @SneakyThrows
     protected void configureGitRepository() {
-        var gitRepository = FileRepositoryBuilder.create(new File(projectDir, ".git"));
-        gitRepository.create();
+        try (Repository gitRepository = FileRepositoryBuilder.create(new File(projectDir, ".git"))) {
+            gitRepository.create();
+        }
     }
 
     protected BuildResult build(String... arguments) {
