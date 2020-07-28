@@ -49,6 +49,7 @@ class VersionsPluginManagerTest extends AbstractPluginManagerTest {
         subProject.getPlugins().apply("java");
 
         List.of(rootProject, subProject).forEach(manager::apply);
+        List.of(rootProject, subProject).forEach(manager::afterEvaluate);
     }
 
     @AfterEach
@@ -56,72 +57,93 @@ class VersionsPluginManagerTest extends AbstractPluginManagerTest {
         verifyNoMoreInteractions(filter);
     }
 
-    @DisplayName("All Project Tests")
+    @DisplayName("Apply Tests")
     @Nested
-    class AllProjectTests {
+    class ApplyTests {
 
-        @Test
-        @DisplayName("Should apply plugins to root project")
-        void shouldApplyPluginsToRootProject() {
-            assertThat(rootProject.getPlugins().hasPlugin(VersionsPlugin.class)).isTrue();
+        @DisplayName("All Project Tests")
+        @Nested
+        class AllProjectTests {
+
+            @Test
+            @DisplayName("Should apply plugins to root project")
+            void shouldApplyPluginsToRootProject() {
+                assertThat(rootProject.getPlugins().hasPlugin(VersionsPlugin.class)).isTrue();
+            }
+
+            @Test
+            @DisplayName("Should apply plugins to sub project")
+            void shouldApplyPluginsToSubProject() {
+                assertThat(subProject.getPlugins().hasPlugin(VersionsPlugin.class)).isTrue();
+            }
         }
 
-        @Test
-        @DisplayName("Should apply plugins to sub project")
-        void shouldApplyPluginsToSubProject() {
-            assertThat(subProject.getPlugins().hasPlugin(VersionsPlugin.class)).isTrue();
+
+        @DisplayName("Root Project Tests")
+        @Nested
+        class RootProjectTests {
+
+            @Test
+            @DisplayName("Should configure checkConstraints")
+            void shouldConfigureCheckConstraints() {
+                rootProject.getTasks().withType(DependencyUpdatesTask.class, task -> assertThat(task.getCheckConstraints()).isTrue());
+            }
+
+            @Test
+            @DisplayName("Should configure DependencyUpdateResolutionStrategy")
+            void shouldConfigureDependencyUpdateResolutionStrategy() {
+                when(filter.reject(any())).thenReturn(false);
+                rootProject.getTasks().withType(DependencyUpdatesTask.class, DependencyUpdatesTask::dependencyUpdates);
+                verify(filter).reject(any());
+            }
+        }
+
+        @DisplayName("Sub Project Tests")
+        @Nested
+        class SubProjectTests {
+
+            @Test
+            @DisplayName("Should not configure checkConstraints")
+            void shouldNotConfigureCheckConstraints() {
+                subProject.getTasks().withType(DependencyUpdatesTask.class, task -> assertThat(task.getCheckConstraints()).isFalse());
+            }
+
+            @Test
+            @DisplayName("Should not configure DependencyUpdateResolutionStrategy")
+            void shouldNotConfigureDependencyUpdateResolutionStrategy() {
+                subProject.getTasks().withType(DependencyUpdatesTask.class, DependencyUpdatesTask::dependencyUpdates);
+                verifyNoInteractions(filter);
+            }
         }
     }
 
-
-    @DisplayName("Root Project Tests")
+    @DisplayName("After Evaluate Tests")
     @Nested
-    class RootProjectTests {
+    class AfterEvaluateTests {
 
-        @Test
-        @DisplayName("Should configure checkConstraints")
-        void shouldConfigureCheckConstraints() {
-            rootProject.getTasks().withType(DependencyUpdatesTask.class, task -> assertThat(task.getCheckConstraints()).isTrue());
+        @DisplayName("Root Project Tests")
+        @Nested
+        class RootProjectTests {
+
+            @Test
+            @DisplayName("Should set the `check` task to depend on the `dependencyUpdates` task")
+            void shouldSetTheCheckTaskToDependOnTheDependencyUpdatesTask() {
+                var dependsOn = findTaskByPath(rootProject, CHECK).getDependsOn();
+                assertThat(dependsOn).hasAtLeastOneElementOfType(DependencyUpdatesTask.class);
+            }
         }
 
-        @Test
-        @DisplayName("Should configure DependencyUpdateResolutionStrategy")
-        void shouldConfigureDependencyUpdateResolutionStrategy() {
-            when(filter.reject(any())).thenReturn(false);
-            rootProject.getTasks().withType(DependencyUpdatesTask.class, DependencyUpdatesTask::dependencyUpdates);
-            verify(filter).reject(any());
-        }
+        @DisplayName("Sub Project Tests")
+        @Nested
+        class SubProjectTests {
 
-        @Test
-        @DisplayName("Should set the `check` task to depend on the `dependencyUpdates` task")
-        void shouldSetTheCheckTaskToDependOnTheDependencyUpdatesTask() {
-            var dependsOn = findTaskByPath(rootProject, CHECK).getDependsOn();
-            assertThat(dependsOn).hasAtLeastOneElementOfType(DependencyUpdatesTask.class);
+            @Test
+            @DisplayName("Should not set the `check` task to depend on the `dependencyUpdates` task")
+            void shouldNotSetTheCheckTaskToDependOnTheDependencyUpdatesTask() {
+                var dependsOn = findTaskByPath(subProject, getSubProjectPath(subProject, CHECK)).getDependsOn();
+                assertThat(dependsOn).doesNotHaveAnyElementsOfTypes(DependencyUpdatesTask.class);
+            }
         }
     }
 
-    @DisplayName("Sub Project Tests")
-    @Nested
-    class SubProjectTests {
-
-        @Test
-        @DisplayName("Should not configure checkConstraints")
-        void shouldNotConfigureCheckConstraints() {
-            subProject.getTasks().withType(DependencyUpdatesTask.class, task -> assertThat(task.getCheckConstraints()).isFalse());
-        }
-
-        @Test
-        @DisplayName("Should not configure DependencyUpdateResolutionStrategy")
-        void shouldNotConfigureDependencyUpdateResolutionStrategy() {
-            subProject.getTasks().withType(DependencyUpdatesTask.class, DependencyUpdatesTask::dependencyUpdates);
-            verifyNoInteractions(filter);
-        }
-
-        @Test
-        @DisplayName("Should not set the `check` task to depend on the `dependencyUpdates` task")
-        void shouldNotSetTheCheckTaskToDependOnTheDependencyUpdatesTask() {
-            var dependsOn = findTaskByPath(subProject, getSubProjectPath(subProject, CHECK)).getDependsOn();
-            assertThat(dependsOn).doesNotHaveAnyElementsOfTypes(DependencyUpdatesTask.class);
-        }
-    }
 }

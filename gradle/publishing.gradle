@@ -5,8 +5,6 @@ pluginBundle {
 }
 
 gradlePlugin {
-    testSourceSets sourceSets.functionalTest
-
     plugins {
         commonGradleBaselinePlugin {
             id = 'com.jrmcdonald.ms-gradle-baseline'

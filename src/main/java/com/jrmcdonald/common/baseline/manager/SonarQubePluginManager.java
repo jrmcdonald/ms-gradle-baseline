@@ -28,7 +28,12 @@ public class SonarQubePluginManager implements PluginManager {
     @Override
     public void apply(Project project) {
         applyToRootProject(project);
-        configureRootProject(project);
+        configureExtension(project);
+    }
+
+    @Override
+    public void afterEvaluate(Project project) {
+        configureTaskOrdering(project);
     }
 
     public void applyToRootProject(Project project) {
@@ -37,15 +42,8 @@ public class SonarQubePluginManager implements PluginManager {
         }
     }
 
-    private void configureRootProject(Project project) {
+    private void configureExtension(Project project) {
         if (isRootProject(project)) {
-            project.getTasks().withType(SonarQubeTask.class, sonarQubeTask -> {
-                var codeCoverageReportTask = project.getTasks().findByPath(getRootProjectPath(CodeCoverageReportTask.NAME));
-                if (codeCoverageReportTask != null) {
-                    sonarQubeTask.setMustRunAfter(List.of(codeCoverageReportTask));
-                }
-            });
-
             var extension = project.getExtensions().findByType(SonarQubeExtension.class);
             if (extension != null) {
                 extension.properties(properties -> {
@@ -55,6 +53,17 @@ public class SonarQubePluginManager implements PluginManager {
                     properties.property(SONAR_COVERAGE_PATH_KEY, format(SONAR_COVERAGE_PATH_FORMAT, project.getBuildDir().toPath()));
                 });
             }
+        }
+    }
+
+    private void configureTaskOrdering(Project project) {
+        if (isRootProject(project)) {
+            project.getTasks().withType(SonarQubeTask.class, sonarQubeTask -> {
+                var codeCoverageReportTask = project.getTasks().findByPath(getRootProjectPath(CodeCoverageReportTask.NAME));
+                if (codeCoverageReportTask != null) {
+                    sonarQubeTask.setMustRunAfter(List.of(codeCoverageReportTask));
+                }
+            });
         }
     }
 }

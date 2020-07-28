@@ -15,21 +15,30 @@ public class DependencyCheckPluginManager implements PluginManager {
     @Override
     public void apply(Project project) {
         applyToProject(project);
-        configureRootProject(project);
+        configureExtension(project);
+    }
+
+    @Override
+    public void afterEvaluate(Project project) {
+        configureTaskOrdering(project);
     }
 
     public void applyToProject(Project project) {
         project.getPlugins().apply(DependencyCheckPlugin.class);
     }
 
-    private void configureRootProject(Project project) {
+    private void configureExtension(Project project) {
         if (isRootProject(project)) {
             var extension = project.getExtensions().findByType(DependencyCheckExtension.class);
             if (extension != null) {
                 extension.setFormat(Format.ALL);
                 extension.getAnalyzers().setNodeEnabled(false);
             }
+        }
+    }
 
+    private void configureTaskOrdering(Project project) {
+        if (isRootProject(project)) {
             project.getTasks().withType(Aggregate.class, task -> {
                 var build = project.getTasks().findByPath(getRootProjectPath(BUILD));
                 if (build != null) {

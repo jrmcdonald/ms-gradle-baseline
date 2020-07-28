@@ -35,91 +35,113 @@ class JacocoPluginManagerTest extends AbstractPluginManagerTest {
         subProject.getPlugins().apply("java");
 
         List.of(rootProject, subProject).forEach(manager::apply);
+        List.of(rootProject, subProject).forEach(manager::afterEvaluate);
     }
 
-    @DisplayName("All Java Projects Tests")
+    @DisplayName("Apply Tests")
     @Nested
-    class AllJavaProjectsTests {
+    class ApplyTests {
 
-        @Test
-        @DisplayName("Should apply plugins to root projects")
-        void shouldApplyPluginsToRootProjects() {
-            assertThat(rootProject.getPlugins().hasPlugin(JacocoPlugin.class)).isTrue();
+        @DisplayName("All Java Projects Tests")
+        @Nested
+        class AllJavaProjectsTests {
+
+            @Test
+            @DisplayName("Should apply plugins to root projects")
+            void shouldApplyPluginsToRootProjects() {
+                assertThat(rootProject.getPlugins().hasPlugin(JacocoPlugin.class)).isTrue();
+            }
+
+            @Test
+            @DisplayName("Should apply plugins to sub projects")
+            void shouldApplyPluginsToSubProjects() {
+                assertThat(subProject.getPlugins().hasPlugin(JacocoPlugin.class)).isTrue();
+            }
+        }
+
+        @DisplayName("Root Project Tests")
+        @Nested
+        class RootProjectTests {
+
+            @Test
+            @DisplayName("Should configure the `codeCoverageReport` task")
+            void shouldConfigureTheCodeCoverageReportTask() {
+                var task = rootProject.getTasks().findByPath(getRootProjectPath(CodeCoverageReportTask.NAME));
+                assertThat(task).isInstanceOf(CodeCoverageReportTask.class);
+            }
+        }
+
+        @DisplayName("Sub Project Tests")
+        @Nested
+        class SubProjectTests {
+
+            @Test
+            @DisplayName("Should not configure the `codeCoverageReport` task")
+            void shouldNotConfigureTheCodeCoverageReportTask() {
+                assertThat(subProject.getTasks().findByPath(getSubProjectPath(subProject, CodeCoverageReportTask.NAME))).isNull();
+            }
         }
 
         @Test
-        @DisplayName("Should apply plugins to sub projects")
-        void shouldApplyPluginsToSubProjects() {
-            assertThat(subProject.getPlugins().hasPlugin(JacocoPlugin.class)).isTrue();
+        @DisplayName("Should not apply expected plugins to non java projects")
+        void shouldNotApplyPluginsToNonJavaProjects() {
+            var nonJavaProject = ProjectBuilder.builder().build();
+
+            manager.apply(nonJavaProject);
+
+            assertThat(nonJavaProject.getPlugins().hasPlugin(JacocoPlugin.class)).isFalse();
         }
     }
 
-    @DisplayName("Root Project Tests")
+    @DisplayName("After Evaluate Tests")
     @Nested
-    class RootProjectTests {
+    class AfterEvaluateTests {
 
-        @Test
-        @DisplayName("Should configure the `codeCoverageReport` task")
-        void shouldConfigureTheCodeCoverageReportTask() {
-            var task = rootProject.getTasks().findByPath(getRootProjectPath(CodeCoverageReportTask.NAME));
-            assertThat(task).isInstanceOf(CodeCoverageReportTask.class);
+        @DisplayName("Root Project Tests")
+        @Nested
+        class RootProjectTests {
+
+            @Test
+            @DisplayName("Should set the `test` task to be finalized by the `codeCoverageReport` task")
+            void shouldSetTheTestTaskToBeFinalizedByTheCodeCoverageReportTask() {
+                var finalizedBy = findTaskByPath(rootProject, getRootProjectPath(TEST)).getFinalizedBy().getDependencies(null);
+                assertThat(finalizedBy).hasAtLeastOneElementOfType(CodeCoverageReportTask.class);
+            }
+
+            @Test
+            @DisplayName("Should set the `check` task to depend on the `codeCoverageReport` task")
+            void shouldSetTheCheckTaskToDependOnTheCodeCoverageReportTask() {
+                var dependsOn = findTaskByPath(rootProject, getRootProjectPath(CHECK)).getDependsOn();
+                assertThat(dependsOn).hasAtLeastOneElementOfType(CodeCoverageReportTask.class);
+            }
         }
 
-        @Test
-        @DisplayName("Should set the `test` task to be finalized by the `codeCoverageReport` task")
-        void shouldSetTheTestTaskToBeFinalizedByTheCodeCoverageReportTask() {
-            var finalizedBy = findTaskByPath(rootProject, getRootProjectPath(TEST)).getFinalizedBy().getDependencies(null);
-            assertThat(finalizedBy).hasAtLeastOneElementOfType(CodeCoverageReportTask.class);
+        @DisplayName("Sub Project Tests")
+        @Nested
+        class SubProjectTests {
+
+            @Test
+            @DisplayName("Should set the `codeCoverageReport` task to depend on the sub project `test` task")
+            void shouldSetTheCodeCoverageReportTaskToDependOnTheSubProjectTestTask() {
+                var dependsOn = findTaskByPath(rootProject, getRootProjectPath(CodeCoverageReportTask.NAME)).getDependsOn();
+                assertThat(dependsOn).contains(subProject.getTasks().findByPath(getSubProjectPath(subProject, TEST)));
+            }
+
+            @Test
+            @DisplayName("Should not set the `test` task to be finalized by the `codeCoverageReport` task")
+            void shouldNotSetTheTestTaskToBeFinalizedByTheCodeCoverageReportTask() {
+                var finalizedBy = findTaskByPath(subProject, getSubProjectPath(subProject, TEST)).getFinalizedBy().getDependencies(null);
+                assertThat(finalizedBy).doesNotHaveAnyElementsOfTypes(CodeCoverageReportTask.class);
+            }
+
+            @Test
+            @DisplayName("Should not set the `check` task to depend on the `codeCoverageReport` task")
+            void shouldNotSetTheCheckTaskToDependOnTheCodeCoverageReportTask() {
+                var dependsOn = findTaskByPath(subProject, getSubProjectPath(subProject, CHECK)).getDependsOn();
+                assertThat(dependsOn).doesNotHaveAnyElementsOfTypes(CodeCoverageReportTask.class);
+            }
+
         }
-
-        @Test
-        @DisplayName("Should set the `check` task to depend on the `codeCoverageReport` task")
-        void shouldSetTheCheckTaskToDependOnTheCodeCoverageReportTask() {
-            var dependsOn = findTaskByPath(rootProject, getRootProjectPath(CHECK)).getDependsOn();
-            assertThat(dependsOn).hasAtLeastOneElementOfType(CodeCoverageReportTask.class);
-        }
-    }
-
-    @DisplayName("Sub Project Tests")
-    @Nested
-    class SubProjectTests {
-
-        @Test
-        @DisplayName("Should set the `codeCoverageReport` task to depend on the sub project `test` task")
-        void shouldSetTheCodeCoverageReportTaskToDependOnTheSubProjectTestTask() {
-            var dependsOn = findTaskByPath(rootProject, getRootProjectPath(CodeCoverageReportTask.NAME)).getDependsOn();
-            assertThat(dependsOn).contains(subProject.getTasks().findByPath(getSubProjectPath(subProject, TEST)));
-        }
-
-        @Test
-        @DisplayName("Should not configure the `codeCoverageReport` task")
-        void shouldNotConfigureTheCodeCoverageReportTask() {
-            assertThat(subProject.getTasks().findByPath(getSubProjectPath(subProject, CodeCoverageReportTask.NAME))).isNull();
-        }
-
-        @Test
-        @DisplayName("Should not set the `test` task to be finalized by the `codeCoverageReport` task")
-        void shouldNotSetTheTestTaskToBeFinalizedByTheCodeCoverageReportTask() {
-            var finalizedBy = findTaskByPath(subProject, getSubProjectPath(subProject, TEST)).getFinalizedBy().getDependencies(null);
-            assertThat(finalizedBy).doesNotHaveAnyElementsOfTypes(CodeCoverageReportTask.class);
-        }
-
-        @Test
-        @DisplayName("Should not set the `check` task to depend on the `codeCoverageReport` task")
-        void shouldNotSetTheCheckTaskToDependOnTheCodeCoverageReportTask() {
-            var dependsOn = findTaskByPath(subProject, getSubProjectPath(subProject, CHECK)).getDependsOn();
-            assertThat(dependsOn).doesNotHaveAnyElementsOfTypes(CodeCoverageReportTask.class);
-        }
-    }
-
-    @Test
-    @DisplayName("Should not apply expected plugins to non java projects")
-    void shouldNotApplyPluginsToNonJavaProjects() {
-        var nonJavaProject = ProjectBuilder.builder().build();
-
-        manager.apply(nonJavaProject);
-
-        assertThat(nonJavaProject.getPlugins().hasPlugin(JacocoPlugin.class)).isFalse();
     }
 
 }

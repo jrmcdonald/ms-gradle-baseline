@@ -3,7 +3,6 @@ package com.jrmcdonald.common.baseline.manager;
 import com.jrmcdonald.common.baseline.core.jacoco.CodeCoverageReportTask;
 import com.jrmcdonald.common.baseline.core.jacoco.JacocoUtils;
 
-import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.testing.jacoco.plugins.JacocoPlugin;
 
@@ -19,32 +18,34 @@ public class JacocoPluginManager implements PluginManager {
     @Override
     public void apply(Project project) {
         applyToJavaProject(project);
-        configureRootProject(project);
-        configureSubProject(project);
+
+        if (isRootProject(project)) {
+            registerCodeCoverageReportTask(project);
+        }
+    }
+
+    @Override
+    public void afterEvaluate(Project project) {
+        if (isRootProject(project)) {
+            configureTaskOrdering(project);
+        } else {
+            setCodeCoverageReportToDependOnTest(project);
+        }
     }
 
     private void applyToJavaProject(Project project) {
         project.getPluginManager().withPlugin("java", unused -> project.getPluginManager().apply(JacocoPlugin.class));
     }
 
-    private void configureRootProject(Project project) {
-        if (isRootProject(project)) {
-            project.getTasks().register(CodeCoverageReportTask.NAME, CodeCoverageReportTask.class);
-            project.getTasks().withType(CodeCoverageReportTask.class, configureTaskOrdering(project));
-        }
+    public void registerCodeCoverageReportTask(Project project) {
+        project.getTasks().register(CodeCoverageReportTask.NAME, CodeCoverageReportTask.class);
     }
 
-    private void configureSubProject(Project project) {
-        if (!isRootProject(project)) {
-            setCodeCoverageReportToDependOnTest(project);
-        }
-    }
-
-    private Action<CodeCoverageReportTask> configureTaskOrdering(Project project) {
-        return task -> {
+    private void configureTaskOrdering(Project project) {
+        project.getTasks().withType(CodeCoverageReportTask.class, task -> {
             setCodeCoverageReportFinalizedByTest(project, task);
             setCheckDependsOnCodeCoverageReport(project, task);
-        };
+        });
     }
 
     private void setCodeCoverageReportFinalizedByTest(Project project, CodeCoverageReportTask task) {

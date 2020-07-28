@@ -21,19 +21,30 @@ public class VersionsPluginManager implements PluginManager {
     @Override
     public void apply(Project project) {
         applyToProject(project);
-        configureRootProject(project);
+        configureDependencyUpdatesTask(project);
+    }
+
+    @Override
+    public void afterEvaluate(Project project) {
+        configureTaskOrdering(project);
     }
 
     public void applyToProject(Project project) {
         project.getPlugins().apply(VersionsPlugin.class);
     }
 
-    public void configureRootProject(Project project) {
+    public void configureDependencyUpdatesTask(Project project) {
         if (isRootProject(project)) {
             project.getTasks().withType(DependencyUpdatesTask.class, task -> {
                 task.setCheckConstraints(true);
                 task.rejectVersionIf(filter);
+            });
+        }
+    }
 
+    private void configureTaskOrdering(Project project) {
+        if (isRootProject(project)) {
+            project.getTasks().withType(DependencyUpdatesTask.class, task -> {
                 var check = project.getTasks().findByPath(getRootProjectPath(CHECK));
                 if (check != null) {
                     check.getDependsOn().add(task);

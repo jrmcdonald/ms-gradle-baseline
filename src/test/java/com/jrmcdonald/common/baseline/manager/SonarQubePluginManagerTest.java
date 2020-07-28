@@ -38,80 +38,95 @@ class SonarQubePluginManagerTest extends AbstractPluginManagerTest {
         subProject = ProjectBuilder.builder().withName("subProject").withParent(rootProject).build();
 
         List.of(rootProject, subProject).forEach(manager::apply);
+        List.of(rootProject, subProject).forEach(manager::afterEvaluate);
     }
 
-    @DisplayName("All Project Test")
+    @DisplayName("Apply Tests")
     @Nested
-    class AllProjectTest {
+    class ApplyTests {
+        @DisplayName("All Project Test")
+        @Nested
+        class AllProjectTest {
 
-        @Test
-        @DisplayName("Should apply plugins to root project")
-        void shouldApplyPluginsToRootProject() {
-            assertThat(rootProject.getPlugins().hasPlugin(SonarQubePlugin.class)).isTrue();
+            @Test
+            @DisplayName("Should apply plugins to root project")
+            void shouldApplyPluginsToRootProject() {
+                assertThat(rootProject.getPlugins().hasPlugin(SonarQubePlugin.class)).isTrue();
+            }
+
+            @Test
+            @DisplayName("Should not apply plugins to non root project")
+            void shouldNotApplyPluginsToNonRootProject() {
+                assertThat(subProject.getPlugins().hasPlugin(SonarQubePlugin.class)).isFalse();
+            }
         }
 
-        @Test
-        @DisplayName("Should not apply plugins to non root project")
-        void shouldNotApplyPluginsToNonRootProject() {
-            assertThat(subProject.getPlugins().hasPlugin(SonarQubePlugin.class)).isFalse();
+        @DisplayName("Root Project Tests")
+        @TestInstance(PER_CLASS)
+        @Nested
+        class RootProjectTests {
+
+            @ParameterizedTest(name = "[{index}] set `{0}` to `{1}`")
+            @MethodSource("defaultProperties")
+            @DisplayName("Should configure the `SonarQubeExtension` with default properties")
+            void shouldConfigureTheSonarQubeExtensionWithDefaultProperties(String key, String value) {
+                rootProject.getTasks().withType(SonarQubeTask.class, task -> assertThat(task.getProperties()).containsEntry(key, value));
+            }
+
+            private Stream<Arguments> defaultProperties() {
+                return Stream.of(
+                        Arguments.of("sonar.projectKey", "jrmcdonald_rootProject"),
+                        Arguments.of("sonar.organization", "jrmcdonald"),
+                        Arguments.of("sonar.host.url", "https://sonarcloud.io")
+                );
+            }
+
+            @Test
+            @DisplayName("Should configure the `xmlReportPaths` property")
+            void shouldConfigureTheXmlReportPathsProperty() {
+                rootProject.getTasks().withType(SonarQubeTask.class, task -> assertThat(task.getProperties()).containsEntry("sonar.coverage.jacoco.xmlReportPaths",
+                                                                                                                            format("%s/reports/jacoco/codeeCoverageReport/codeCoverageReport.xml",
+                                                                                                                                   rootProject.getBuildDir().toPath())));
+            }
+        }
+
+        @DisplayName("Sub Project Tests")
+        @TestInstance(PER_CLASS)
+        @Nested
+        class SubProjectTests {
+
+            @ParameterizedTest(name = "[{index}] should not set `{0}`")
+            @MethodSource("defaultPropertyKeys")
+            @DisplayName("Should not configure the `SonarQubeExtension` with default properties")
+            void shouldNotConfigureTheSonarQubeExtensionWithDefaultProperties(String key) {
+                subProject.getTasks().withType(SonarQubeTask.class, task -> assertThat(task.getProperties()).doesNotContainKey(key));
+            }
+
+            private Stream<Arguments> defaultPropertyKeys() {
+                return Stream.of(
+                        Arguments.of("sonar.projectKey"),
+                        Arguments.of("sonar.organization"),
+                        Arguments.of("sonar.host.url"),
+                        Arguments.of("sonar.coverage.jacoco.xmlReportPaths")
+                );
+            }
         }
     }
 
-    @DisplayName("Root Project Tests")
-    @TestInstance(PER_CLASS)
+    @DisplayName("After Evaluate Tests")
     @Nested
-    class RootProjectTests {
+    class AfterEvaluateTests {
 
-        @Test
-        @DisplayName("Should set the `sonarqube` task to must run after the `codeCoverageReport` task")
-        void shouldSetTheSonarqubeTaskToMustRunAfterTheCodeCoverageReportTask() {
-            var mustRunAfter = findTaskByPath(rootProject, "sonarqube").getMustRunAfter().getDependencies(null);
-            assertThat(mustRunAfter).hasAtLeastOneElementOfType(CodeCoverageReportTask.class);
-        }
+        @DisplayName("Root Project Tests")
+        @Nested
+        class RootProjectTests {
 
-        @ParameterizedTest(name = "[{index}] set `{0}` to `{1}`")
-        @MethodSource("defaultProperties")
-        @DisplayName("Should configure the `SonarQubeExtension` with default properties")
-        void shouldConfigureTheSonarQubeExtensionWithDefaultProperties(String key, String value) {
-            rootProject.getTasks().withType(SonarQubeTask.class, task -> assertThat(task.getProperties()).containsEntry(key, value));
-        }
-
-        private Stream<Arguments> defaultProperties() {
-            return Stream.of(
-                    Arguments.of("sonar.projectKey", "jrmcdonald_rootProject"),
-                    Arguments.of("sonar.organization", "jrmcdonald"),
-                    Arguments.of("sonar.host.url", "https://sonarcloud.io")
-            );
-        }
-
-        @Test
-        @DisplayName("Should configure the `xmlReportPaths` property")
-        void shouldConfigureTheXmlReportPathsProperty() {
-            rootProject.getTasks().withType(SonarQubeTask.class, task -> assertThat(task.getProperties()).containsEntry("sonar.coverage.jacoco.xmlReportPaths",
-                                                                                                                        format("%s/reports/jacoco/codeeCoverageReport/codeCoverageReport.xml",
-                                                                                                                               rootProject.getBuildDir().toPath())));
-        }
-    }
-
-    @DisplayName("Sub Project Tests")
-    @TestInstance(PER_CLASS)
-    @Nested
-    class SubProjectTests {
-
-        @ParameterizedTest(name = "[{index}] should not set `{0}`")
-        @MethodSource("defaultPropertyKeys")
-        @DisplayName("Should not configure the `SonarQubeExtension` with default properties")
-        void shouldNotConfigureTheSonarQubeExtensionWithDefaultProperties(String key) {
-            subProject.getTasks().withType(SonarQubeTask.class, task -> assertThat(task.getProperties()).doesNotContainKey(key));
-        }
-
-        private Stream<Arguments> defaultPropertyKeys() {
-            return Stream.of(
-                    Arguments.of("sonar.projectKey"),
-                    Arguments.of("sonar.organization"),
-                    Arguments.of("sonar.host.url"),
-                    Arguments.of("sonar.coverage.jacoco.xmlReportPaths")
-            );
+            @Test
+            @DisplayName("Should set the `sonarqube` task to must run after the `codeCoverageReport` task")
+            void shouldSetTheSonarqubeTaskToMustRunAfterTheCodeCoverageReportTask() {
+                var mustRunAfter = findTaskByPath(rootProject, "sonarqube").getMustRunAfter().getDependencies(null);
+                assertThat(mustRunAfter).hasAtLeastOneElementOfType(CodeCoverageReportTask.class);
+            }
         }
     }
 }

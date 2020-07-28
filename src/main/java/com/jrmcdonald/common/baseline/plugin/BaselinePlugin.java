@@ -15,28 +15,40 @@ import org.gradle.api.Project;
 
 import java.util.List;
 
+import lombok.Setter;
+
 public class BaselinePlugin implements Plugin<Project> {
+
+    @Setter
+    private List<PluginManager> managers;
+
+    public BaselinePlugin() {
+        managers = List.of(new DependencyCheckPluginManager(),
+                           new GitHooksPluginManager(),
+                           new JacocoPluginManager(),
+                           new SonarQubePluginManager(),
+                           new SpotBugsPluginManager(),
+                           new SpringBootPluginManager(),
+                           new VersionsPluginManager());
+    }
 
     @Override
     public void apply(Project project) {
-        var managers = List.of(new DependencyCheckPluginManager(),
-                               new GitHooksPluginManager(),
-                               new JacocoPluginManager(),
-                               new SonarQubePluginManager(),
-                               new SpotBugsPluginManager(),
-                               new SpringBootPluginManager(),
-                               new VersionsPluginManager());
-
-        applyToProjectWithManagers(project, managers);
-    }
-
-    public static void applyToProjectWithManagers(Project project, List<? extends PluginManager> managers) {
-        var root = project.getRootProject();
-        if (!project.equals(root)) {
+        var rootProject = project.getRootProject();
+        if (!project.equals(rootProject)) {
             throw new InvalidProjectTargetException("com.jrmcdonald.common.baseline should be applied to the root project only");
         }
 
-        managers.forEach(manager -> root.allprojects(manager::apply));
+        rootProject.allprojects(this::applyManagers);
+        rootProject.allprojects(this::afterEvaluateManagers);
+    }
+
+    private void applyManagers(Project project) {
+        managers.forEach(manager -> manager.apply(project));
+    }
+
+    private void afterEvaluateManagers(Project project) {
+        project.afterEvaluate(p -> managers.forEach(manager -> manager.afterEvaluate(p)));
     }
 
 }
