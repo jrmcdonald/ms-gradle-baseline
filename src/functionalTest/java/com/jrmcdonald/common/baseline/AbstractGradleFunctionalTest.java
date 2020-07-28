@@ -11,6 +11,8 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import javax.annotation.Nonnull;
+
 import lombok.SneakyThrows;
 
 public abstract class AbstractGradleFunctionalTest {
@@ -37,9 +39,20 @@ public abstract class AbstractGradleFunctionalTest {
 
     @SneakyThrows
     protected void configureGitRepository() {
-        try (Repository gitRepository = FileRepositoryBuilder.create(new File(projectDir, ".git"))) {
+        try (Repository gitRepository = createRepository()) {
             gitRepository.create();
         }
+    }
+
+    /**
+     * Workaround for https://github.com/spotbugs/spotbugs/issues/756
+     *
+     * @return the created git repository
+     */
+    @SneakyThrows
+    @Nonnull
+    private Repository createRepository() {
+        return FileRepositoryBuilder.create(new File(projectDir, ".git"));
     }
 
     protected BuildResult build(String... arguments) {
