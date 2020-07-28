@@ -66,6 +66,10 @@ dependencies {
     functionalTestImplementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: "${jgitVersion}"
 }
 
+jar {
+    enabled = true
+}
+
 tasks.withType(Test) {
     useJUnitPlatform()
 }
