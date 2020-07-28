@@ -1,5 +1,6 @@
 plugins {
     id 'java-gradle-plugin'
+    id 'com.jrmcdonald.ms-gradle-baseline' version "${gradleBaselinePluginVerson}"
     id 'com.gradle.plugin-publish' version "${gradlePluginPublishPluginVersion}"
 }
 
