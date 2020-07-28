@@ -1,43 +1,54 @@
 package com.jrmcdonald.common.baseline.plugin;
 
-import com.jrmcdonald.common.baseline.configurer.DependencyCheckPluginConfigurer;
-import com.jrmcdonald.common.baseline.configurer.GitHooksPluginConfigurer;
-import com.jrmcdonald.common.baseline.configurer.JacocoPluginConfigurer;
-import com.jrmcdonald.common.baseline.configurer.PluginConfigurer;
-import com.jrmcdonald.common.baseline.configurer.SonarQubePluginConfigurer;
-import com.jrmcdonald.common.baseline.configurer.SpotBugsPluginConfigurer;
-import com.jrmcdonald.common.baseline.configurer.SpringBootPluginConfigurer;
-import com.jrmcdonald.common.baseline.configurer.VersionsPluginConfigurer;
 import com.jrmcdonald.common.baseline.exception.InvalidProjectTargetException;
+import com.jrmcdonald.common.baseline.manager.DependencyCheckPluginManager;
+import com.jrmcdonald.common.baseline.manager.GitHooksPluginManager;
+import com.jrmcdonald.common.baseline.manager.JacocoPluginManager;
+import com.jrmcdonald.common.baseline.manager.PluginManager;
+import com.jrmcdonald.common.baseline.manager.SonarQubePluginManager;
+import com.jrmcdonald.common.baseline.manager.SpotBugsPluginManager;
+import com.jrmcdonald.common.baseline.manager.SpringBootPluginManager;
+import com.jrmcdonald.common.baseline.manager.VersionsPluginManager;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
 import java.util.List;
 
+import lombok.Setter;
+
 public class BaselinePlugin implements Plugin<Project> {
+
+    @Setter
+    private List<PluginManager> managers;
+
+    public BaselinePlugin() {
+        managers = List.of(new DependencyCheckPluginManager(),
+                           new GitHooksPluginManager(),
+                           new JacocoPluginManager(),
+                           new SonarQubePluginManager(),
+                           new SpotBugsPluginManager(),
+                           new SpringBootPluginManager(),
+                           new VersionsPluginManager());
+    }
 
     @Override
     public void apply(Project project) {
-        var configurers = List.of(DependencyCheckPluginConfigurer.class,
-                                  GitHooksPluginConfigurer.class,
-                                  JacocoPluginConfigurer.class,
-                                  SonarQubePluginConfigurer.class,
-                                  SpotBugsPluginConfigurer.class,
-                                  SpringBootPluginConfigurer.class,
-                                  VersionsPluginConfigurer.class);
-
-        applyToProjectWithConfigurers(project, configurers);
-    }
-
-    public static void applyToProjectWithConfigurers(Project project, List<Class<? extends PluginConfigurer>> configurers) {
-        var root = project.getRootProject();
-        if (!project.equals(root)) {
+        var rootProject = project.getRootProject();
+        if (!project.equals(rootProject)) {
             throw new InvalidProjectTargetException("com.jrmcdonald.common.baseline should be applied to the root project only");
         }
 
-        root.allprojects(p -> configurers.forEach(configurer -> p.getPlugins()
-                                                                 .apply(configurer)));
+        rootProject.allprojects(this::applyManagers);
+        rootProject.allprojects(this::afterEvaluateManagers);
+    }
+
+    private void applyManagers(Project project) {
+        managers.forEach(manager -> manager.apply(project));
+    }
+
+    private void afterEvaluateManagers(Project project) {
+        project.afterEvaluate(p -> managers.forEach(manager -> manager.afterEvaluate(p)));
     }
 
 }

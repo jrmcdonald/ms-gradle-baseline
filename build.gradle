@@ -21,8 +21,8 @@ repositories {
     }
 }
 
-apply from: "${rootDir}/gradle/functional-test.gradle"
 apply from: "${rootDir}/gradle/publishing.gradle"
+apply from: "${rootDir}/gradle/functional-test.gradle"
 
 configurations {
     commonPlatform
@@ -49,6 +49,9 @@ dependencies {
     implementation group: 'org.owasp', name: 'dependency-check-gradle', version: "${dependencyCheckPluginVersion}"
     implementation group: 'org.sonarsource.scanner.gradle', name: 'sonarqube-gradle-plugin', version: "${sonarqubePluginVersion}"
     implementation group: 'org.springframework.boot', name: 'spring-boot-gradle-plugin', version: "${springbootPluginVersion}"
+
+    testCompileOnly group: 'org.projectlombok', name: 'lombok'
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
 
     testImplementation group: 'org.assertj', name: 'assertj-core'
     testImplementation group: 'org.force66', name: 'BeanTester'
