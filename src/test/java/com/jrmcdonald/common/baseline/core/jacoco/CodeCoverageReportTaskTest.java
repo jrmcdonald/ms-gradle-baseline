@@ -43,17 +43,6 @@ class CodeCoverageReportTaskTest {
         subProject.getTasks().getByName("jacocoTestReport");
     }
 
-    @Test
-    @DisplayName("Should enable html reports")
-    void shouldEnableHtmlReports() {
-        rootProject.getTasks().withType(CodeCoverageReportTask.class, task -> assertThat(task.getReports().getHtml().isEnabled()).isTrue());
-    }
-
-    @Test
-    @DisplayName("Should enable xml reports")
-    void shouldEnableXmlReports() {
-        rootProject.getTasks().withType(CodeCoverageReportTask.class, task -> assertThat(task.getReports().getXml().isEnabled()).isTrue());
-    }
 
     @Test
     @DisplayName("Should not configure source sets for intermediate project")

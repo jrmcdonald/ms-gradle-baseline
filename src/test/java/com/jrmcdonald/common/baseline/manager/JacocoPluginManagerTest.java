@@ -114,6 +114,18 @@ class JacocoPluginManagerTest extends AbstractPluginManagerTest {
                 var dependsOn = findTaskByPath(rootProject, getRootProjectPath(CHECK)).getDependsOn();
                 assertThat(dependsOn).hasAtLeastOneElementOfType(CodeCoverageReportTask.class);
             }
+
+            @Test
+            @DisplayName("Should enable html reports")
+            void shouldEnableHtmlReports() {
+                rootProject.getTasks().withType(CodeCoverageReportTask.class, task -> assertThat(task.getReports().getHtml().isEnabled()).isTrue());
+            }
+
+            @Test
+            @DisplayName("Should enable xml reports")
+            void shouldEnableXmlReports() {
+                rootProject.getTasks().withType(CodeCoverageReportTask.class, task -> assertThat(task.getReports().getXml().isEnabled()).isTrue());
+            }
         }
 
         @DisplayName("Sub Project Tests")
