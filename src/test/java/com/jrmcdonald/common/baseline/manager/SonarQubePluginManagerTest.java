@@ -85,7 +85,7 @@ class SonarQubePluginManagerTest extends AbstractPluginManagerTest {
             @DisplayName("Should configure the `xmlReportPaths` property")
             void shouldConfigureTheXmlReportPathsProperty() {
                 rootProject.getTasks().withType(SonarQubeTask.class, task -> assertThat(task.getProperties()).containsEntry("sonar.coverage.jacoco.xmlReportPaths",
-                                                                                                                            format("%s/reports/jacoco/codeeCoverageReport/codeCoverageReport.xml",
+                                                                                                                            format("%s/reports/jacoco/codeCoverageReport/codeCoverageReport.xml",
                                                                                                                                    rootProject.getBuildDir().toPath())));
             }
         }
