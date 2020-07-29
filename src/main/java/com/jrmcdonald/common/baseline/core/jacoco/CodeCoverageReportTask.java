@@ -5,6 +5,9 @@ import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.testing.jacoco.plugins.JacocoPlugin;
 import org.gradle.testing.jacoco.tasks.JacocoReport;
 
+import java.io.File;
+import java.util.Objects;
+
 @SuppressWarnings("java:S110")
 public class CodeCoverageReportTask extends JacocoReport {
 
@@ -28,10 +31,15 @@ public class CodeCoverageReportTask extends JacocoReport {
     private void configureSourceSetsAndExecutionData(Project project) {
         project.getTasks().matching(JacocoUtils::hasJacocoTaskExtension).configureEach(task -> {
             var javaPluginConvention = project.getConvention().getPlugin(JavaPluginConvention.class);
-            var main = javaPluginConvention.getSourceSets().findByName("main");
+            var main = Objects.requireNonNull(javaPluginConvention.getSourceSets().findByName("main"));
 
-            sourceSets(main);
-            executionData(task);
+            var sourceExists = main.getAllJava().getSourceDirectories().getFiles().stream().allMatch(File::exists);
+
+            // this accounts for projects with intermediate, empty, sub-projects
+            if (sourceExists) {
+                sourceSets(main);
+                executionData(task);
+            }
         });
     }
 
