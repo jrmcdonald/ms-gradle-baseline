@@ -23,7 +23,7 @@ public class SonarQubePluginManager implements PluginManager {
     private static final String SONAR_PROJECT_KEY_FORMAT = "jrmcdonald_%s";
     private static final String SONAR_ORGANISATION_VALUE = "jrmcdonald";
     private static final String SONAR_HOST_URL_VALUE = "https://sonarcloud.io";
-    private static final String SONAR_COVERAGE_PATH_FORMAT = "%s/reports/jacoco/codeeCoverageReport/codeCoverageReport.xml";
+    private static final String SONAR_COVERAGE_PATH_FORMAT = "%s/reports/jacoco/codeCoverageReport/codeCoverageReport.xml";
 
     @Override
     public void apply(Project project) {
