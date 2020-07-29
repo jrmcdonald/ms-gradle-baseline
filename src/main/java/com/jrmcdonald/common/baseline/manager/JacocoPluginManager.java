@@ -27,7 +27,7 @@ public class JacocoPluginManager implements PluginManager {
     @Override
     public void afterEvaluate(Project project) {
         if (isRootProject(project)) {
-            configureTaskOrdering(project);
+            configureCodeCoverageTask(project);
         } else {
             setCodeCoverageReportToDependOnTest(project);
         }
@@ -41,11 +41,21 @@ public class JacocoPluginManager implements PluginManager {
         project.getTasks().register(CodeCoverageReportTask.NAME, CodeCoverageReportTask.class);
     }
 
-    private void configureTaskOrdering(Project project) {
+    private void configureCodeCoverageTask(Project project) {
         project.getTasks().withType(CodeCoverageReportTask.class, task -> {
-            setCodeCoverageReportFinalizedByTest(project, task);
-            setCheckDependsOnCodeCoverageReport(project, task);
+            configureTaskOrdering(project, task);
+            configureTaskReports(task);
         });
+    }
+
+    private void configureTaskOrdering(Project project, CodeCoverageReportTask task) {
+        setCodeCoverageReportFinalizedByTest(project, task);
+        setCheckDependsOnCodeCoverageReport(project, task);
+    }
+
+    private void configureTaskReports(CodeCoverageReportTask task) {
+        task.getReports().getHtml().setEnabled(true);
+        task.getReports().getXml().setEnabled(true);
     }
 
     private void setCodeCoverageReportFinalizedByTest(Project project, CodeCoverageReportTask task) {

@@ -18,9 +18,6 @@ public class CodeCoverageReportTask extends JacocoReport {
     }
 
     private void init(Project project) {
-        getReports().getHtml().setEnabled(true);
-        getReports().getXml().setEnabled(true);
-
         project.getSubprojects().forEach(this::configureSubProjectsWithJacocoPlugin);
     }
 
