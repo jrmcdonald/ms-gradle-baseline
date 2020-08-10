@@ -17,4 +17,15 @@ public class SpringBootPluginFunctionalTest extends AbstractGradleFunctionalTest
         assertThat(result.getOutput()).contains(":bootRun SKIPPED")
                                       .contains(BUILD_SUCCESSFUL);
     }
+
+    @Test
+    @DisplayName("Cannot execute `bootRun` task when `springBootEnabled` is false")
+    void cannotExecuteBootRunTaskWhenSpringBootEnabledIsFalse() {
+        appendToProject("src/functionalTest/resources/snippets/baseline-spring-boot-disabled.gradle", BUILD_GRADLE);
+
+        var result = buildAndFail("bootRun", "-m");
+
+        assertThat(result.getOutput()).contains("Task 'bootRun' not found in root project");
+    }
+
 }

@@ -1,3 +1,4 @@
+
 # ms-gradle-baseline ![build](https://github.com/jrmcdonald/ms-gradle-baseline/workflows/build/badge.svg)
 
 ## Overview
@@ -115,6 +116,18 @@ check.dependsOn codeCoverageReport
 ### Spring Boot Plugin
 
 Enable Spring Boot applications using the [Spring Boot Plugin](https://plugins.gradle.org/plugin/org.springframework.boot).
+
+Note that this can be disabled through the plugin extension as follows:
+
+```groovy
+baseline {
+    springBootEnabled = false
+}
+```
+
+### SonarQube Plugin
+
+Enable sonarqube reporting using the [SonarScanner Plugin](https://github.com/SonarSource/sonar-scanner-gradle) and [SonarCloud](https://sonarcloud.io).
 
 ```groovy
 sonarqube {

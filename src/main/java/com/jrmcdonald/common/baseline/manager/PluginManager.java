@@ -4,7 +4,7 @@ import org.gradle.api.Project;
 
 public interface PluginManager {
 
-    void apply(Project project);
+    default void apply(Project project) {}
 
     default void afterEvaluate(Project project) {}
 

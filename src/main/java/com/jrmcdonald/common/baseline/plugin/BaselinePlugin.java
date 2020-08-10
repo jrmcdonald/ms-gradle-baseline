@@ -39,8 +39,9 @@ public class BaselinePlugin implements Plugin<Project> {
             throw new InvalidProjectTargetException("com.jrmcdonald.common.baseline should be applied to the root project only");
         }
 
-        rootProject.allprojects(this::applyManagers);
-        rootProject.allprojects(this::afterEvaluateManagers);
+        project.getExtensions().create("baseline", BaselinePluginExtension.class);
+        project.allprojects(this::applyManagers);
+        project.allprojects(this::afterEvaluateManagers);
     }
 
     private void applyManagers(Project project) {

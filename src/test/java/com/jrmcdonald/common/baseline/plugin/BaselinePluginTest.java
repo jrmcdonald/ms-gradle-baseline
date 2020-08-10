@@ -47,6 +47,19 @@ class BaselinePluginTest {
     }
 
     @Test
+    @DisplayName("Should register extension")
+    void shouldRegisterExtension() {
+        plugin.apply(rootProject);
+
+        var extension = rootProject.getExtensions().findByName("baseline");
+
+        assertThat(extension).isInstanceOf(BaselinePluginExtension.class);
+
+        verify(manager).apply(rootProject);
+        verify(manager).apply(subProject);
+    }
+
+    @Test
     @DisplayName("Should execute manager")
     void shouldCallApplyOnManager() {
         plugin.apply(rootProject);

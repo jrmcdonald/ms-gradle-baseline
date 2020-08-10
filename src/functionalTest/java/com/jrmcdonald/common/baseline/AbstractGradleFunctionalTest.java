@@ -10,6 +10,7 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import javax.annotation.Nonnull;
 
@@ -17,6 +18,8 @@ import lombok.SneakyThrows;
 
 public abstract class AbstractGradleFunctionalTest {
 
+    protected static final String SETTINGS_GRADLE = "settings.gradle";
+    protected static final String BUILD_GRADLE = "build.gradle";
     private static final String SETTINGS_TEMPLATE_FILE = "src/functionalTest/resources/settings.gradle";
     private static final String GRADLE_TEMPLATE_FILE = "src/functionalTest/resources/build.gradle";
     protected static final String BUILD_SUCCESSFUL = "BUILD SUCCESSFUL";
@@ -26,8 +29,8 @@ public abstract class AbstractGradleFunctionalTest {
 
     @BeforeEach
     void configureProject() {
-        copyToProject(SETTINGS_TEMPLATE_FILE, "settings.gradle");
-        copyToProject(GRADLE_TEMPLATE_FILE, "build.gradle");
+        copyToProject(SETTINGS_TEMPLATE_FILE, SETTINGS_GRADLE);
+        copyToProject(GRADLE_TEMPLATE_FILE, BUILD_GRADLE);
         configureGitHooksDirectory();
         configureGitRepository();
     }
@@ -74,8 +77,12 @@ public abstract class AbstractGradleFunctionalTest {
     }
 
     @SneakyThrows
-    private void copyToProject(String source, String destination) {
+    private void copyToProject(@Nonnull String source, @Nonnull String destination) {
         Files.write(new File(projectDir, destination).toPath(), Files.readAllBytes(Paths.get(source)));
     }
 
+    @SneakyThrows
+    protected void appendToProject(@Nonnull String source, String destination) {
+        Files.write(new File(projectDir, destination).toPath(), Files.readAllBytes(Paths.get(source)), StandardOpenOption.APPEND);
+    }
 }
