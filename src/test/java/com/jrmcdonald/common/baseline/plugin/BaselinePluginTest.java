@@ -1,7 +1,7 @@
 package com.jrmcdonald.common.baseline.plugin;
 
 import com.jrmcdonald.common.baseline.exception.InvalidProjectTargetException;
-import com.jrmcdonald.common.baseline.manager.PluginManager;
+import com.jrmcdonald.common.baseline.manager.plugin.PluginManager;
 
 import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
