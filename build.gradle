@@ -47,7 +47,6 @@ dependencies {
     testCompileOnly group: 'org.projectlombok', name: 'lombok'
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
 
-    testImplementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: "${spotBugsAnnotationsVersion}"
     testImplementation group: 'org.assertj', name: 'assertj-core'
     testImplementation group: 'org.force66', name: 'BeanTester', version: "${beanTesterVersion}"
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
