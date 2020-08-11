@@ -9,6 +9,5 @@ public final class TaskNames {
     public static final String BUILD = "build";
     public static final String CHECK = "check";
     public static final String TEST = "test";
-    public static final String JAR = "jar";
 
 }
