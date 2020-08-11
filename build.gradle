@@ -13,13 +13,6 @@ ext['gradle.publish.secret'] = System.getenv("GRADLE_PUBLISH_SECRET")
 repositories {
     mavenCentral()
     gradlePluginPortal()
-    maven {
-        url = 'https://maven.pkg.github.com/jrmcdonald/ms-common'
-        credentials {
-            username = "jrmcdonald"
-            password = System.getenv("GITHUB_TOKEN")
-        }
-    }
 }
 
 apply from: "${rootDir}/gradle/publishing.gradle"
@@ -38,7 +31,7 @@ configurations {
 }
 
 dependencies {
-    commonPlatform enforcedPlatform(group: 'com.jrmcdonald', name: 'ms-common-bom', version: "${commonPlatformVersion}")
+    commonPlatform enforcedPlatform(group: 'org.springframework.boot', name: 'spring-boot-dependencies', version: "${springbootPluginVersion}")
 
     compileOnly group: 'org.projectlombok', name: 'lombok'
     annotationProcessor group: 'org.projectlombok', name: 'lombok'
@@ -54,8 +47,9 @@ dependencies {
     testCompileOnly group: 'org.projectlombok', name: 'lombok'
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
 
+    testImplementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: "${spotBugsAnnotationsVersion}"
     testImplementation group: 'org.assertj', name: 'assertj-core'
-    testImplementation group: 'org.force66', name: 'BeanTester'
+    testImplementation group: 'org.force66', name: 'BeanTester', version: "${beanTesterVersion}"
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter'
     testImplementation group: 'org.mockito', name: 'mockito-core'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter'
