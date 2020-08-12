@@ -5,11 +5,12 @@ import com.jrmcdonald.common.baseline.core.jacoco.JacocoUtils;
 
 import org.gradle.api.Project;
 import org.gradle.testing.jacoco.plugins.JacocoPlugin;
-
-import java.util.List;
+import org.gradle.testing.jacoco.tasks.JacocoReport;
 
 import static com.jrmcdonald.common.baseline.core.constants.TaskNames.CHECK;
+import static com.jrmcdonald.common.baseline.core.constants.TaskNames.JACOCO_TEST_REPORT;
 import static com.jrmcdonald.common.baseline.core.constants.TaskNames.TEST;
+import static com.jrmcdonald.common.baseline.util.ProjectUtils.findTaskByName;
 import static com.jrmcdonald.common.baseline.util.ProjectUtils.isRootProject;
 import static com.jrmcdonald.common.baseline.util.TaskPathUtils.getRootProjectPath;
 
@@ -27,9 +28,10 @@ public class JacocoPluginManager implements PluginManager {
     @Override
     public void afterEvaluate(Project project) {
         if (isRootProject(project)) {
-            configureCodeCoverageTask(project);
+            configureJacocoReportTasks(project);
+            setJacocoReportToDependOnTest(project, JACOCO_TEST_REPORT);
         } else {
-            setCodeCoverageReportToDependOnTest(project);
+            setJacocoReportToDependOnTest(project, CodeCoverageReportTask.NAME);
         }
     }
 
@@ -41,43 +43,42 @@ public class JacocoPluginManager implements PluginManager {
         project.getTasks().register(CodeCoverageReportTask.NAME, CodeCoverageReportTask.class);
     }
 
-    private void configureCodeCoverageTask(Project project) {
-        project.getTasks().withType(CodeCoverageReportTask.class, task -> {
+    private void configureJacocoReportTasks(Project project) {
+        // configure both our custom report task and the standard jacocoTestReport task
+        project.getTasks().withType(JacocoReport.class, task -> {
             configureTaskOrdering(project, task);
             configureTaskReports(task);
         });
     }
 
-    private void configureTaskOrdering(Project project, CodeCoverageReportTask task) {
-        setCodeCoverageReportFinalizedByTest(project, task);
-        setCheckDependsOnCodeCoverageReport(project, task);
+    private void configureTaskOrdering(Project project, JacocoReport task) {
+        setTaskFinalizedByTest(project, task);
+        setCheckDependsOnTask(project, task);
     }
 
-    private void configureTaskReports(CodeCoverageReportTask task) {
+    private void setTaskFinalizedByTest(Project project, JacocoReport task) {
+        var testTask = project.getTasks().findByPath(getRootProjectPath(TEST));
+        if (testTask != null) {
+            testTask.finalizedBy(task);
+        }
+    }
+
+    private void setCheckDependsOnTask(Project project, JacocoReport task) {
+        var checkTask = project.getTasks().findByPath(getRootProjectPath(CHECK));
+        if (checkTask != null) {
+            checkTask.dependsOn(task);
+        }
+    }
+
+    private void configureTaskReports(JacocoReport task) {
         task.getReports().getHtml().setEnabled(true);
         task.getReports().getXml().setEnabled(true);
     }
 
-    private void setCodeCoverageReportFinalizedByTest(Project project, CodeCoverageReportTask task) {
-        var testTask = project.getTasks().findByPath(getRootProjectPath(TEST));
-        if (testTask != null) {
-            testTask.setFinalizedBy(List.of(task));
-        }
-    }
-
-    private void setCheckDependsOnCodeCoverageReport(Project project, CodeCoverageReportTask task) {
-        var checkTask = project.getTasks().findByPath(getRootProjectPath(CHECK));
-        if (checkTask != null) {
-            checkTask.getDependsOn().add(task);
-        }
-    }
-
-    private void setCodeCoverageReportToDependOnTest(Project project) {
+    private void setJacocoReportToDependOnTest(Project project, String jacocoReportTaskName) {
         project.getTasks()
                .matching(JacocoUtils::hasJacocoTaskExtension)
-               .forEach(task -> project.getRootProject()
-                                       .getTasks()
-                                       .withType(CodeCoverageReportTask.class, codeCoverageReportTask -> codeCoverageReportTask.setDependsOn(List.of(task))));
+               .forEach(findTaskByName(project.getRootProject(), jacocoReportTaskName, JacocoReport.class)::dependsOn);
     }
 
 }

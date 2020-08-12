@@ -12,6 +12,7 @@ import java.util.List;
 import static com.jrmcdonald.common.baseline.util.ProjectUtils.isRootProject;
 import static com.jrmcdonald.common.baseline.util.TaskPathUtils.getRootProjectPath;
 import static java.lang.String.format;
+import static java.lang.String.join;
 
 public class SonarQubePluginManager implements PluginManager {
 
@@ -24,6 +25,7 @@ public class SonarQubePluginManager implements PluginManager {
     private static final String SONAR_ORGANISATION_VALUE = "jrmcdonald";
     private static final String SONAR_HOST_URL_VALUE = "https://sonarcloud.io";
     private static final String SONAR_COVERAGE_PATH_FORMAT = "%s/reports/jacoco/codeCoverageReport/codeCoverageReport.xml";
+    private static final String JACOCO_TEST_REPORT_PATH = "%s/reports/jacoco/test/jacocoTestReport.xml";
 
     @Override
     public void apply(Project project) {
@@ -46,11 +48,14 @@ public class SonarQubePluginManager implements PluginManager {
         if (isRootProject(project)) {
             var extension = project.getExtensions().findByType(SonarQubeExtension.class);
             if (extension != null) {
+                var codeCoverageReportPath = format(SONAR_COVERAGE_PATH_FORMAT, project.getBuildDir().toPath());
+                var jacocoTestReportPath = format(JACOCO_TEST_REPORT_PATH, project.getBuildDir().toPath());
+
                 extension.properties(properties -> {
                     properties.property(SONAR_PROJECT_KEY, format(SONAR_PROJECT_KEY_FORMAT, project.getName()));
                     properties.property(SONAR_ORGANIZATION_KEY, SONAR_ORGANISATION_VALUE);
                     properties.property(SONAR_HOST_URL_KEY, SONAR_HOST_URL_VALUE);
-                    properties.property(SONAR_COVERAGE_PATH_KEY, format(SONAR_COVERAGE_PATH_FORMAT, project.getBuildDir().toPath()));
+                    properties.property(SONAR_COVERAGE_PATH_KEY, join(",", codeCoverageReportPath, jacocoTestReportPath));
                 });
             }
         }

@@ -5,6 +5,7 @@ import com.jrmcdonald.common.baseline.core.jacoco.CodeCoverageReportTask;
 import org.gradle.api.Project;
 import org.gradle.testfixtures.ProjectBuilder;
 import org.gradle.testing.jacoco.plugins.JacocoPlugin;
+import org.gradle.testing.jacoco.tasks.JacocoReport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static com.jrmcdonald.common.baseline.core.constants.TaskNames.CHECK;
+import static com.jrmcdonald.common.baseline.core.constants.TaskNames.JACOCO_TEST_REPORT;
 import static com.jrmcdonald.common.baseline.core.constants.TaskNames.TEST;
 import static com.jrmcdonald.common.baseline.util.TaskPathUtils.getRootProjectPath;
 import static com.jrmcdonald.common.baseline.util.TaskPathUtils.getSubProjectPath;
@@ -101,30 +103,74 @@ class JacocoPluginManagerTest extends AbstractPluginManagerTest {
         @Nested
         class RootProjectTests {
 
-            @Test
-            @DisplayName("Should set the `test` task to be finalized by the `codeCoverageReport` task")
-            void shouldSetTheTestTaskToBeFinalizedByTheCodeCoverageReportTask() {
-                var finalizedBy = findTaskByPath(rootProject, getRootProjectPath(TEST)).getFinalizedBy().getDependencies(null);
-                assertThat(finalizedBy).hasAtLeastOneElementOfType(CodeCoverageReportTask.class);
+            @DisplayName("CodeCoverageReport Tests")
+            @Nested
+            class CodeCoverageReportTests {
+
+                @Test
+                @DisplayName("Should set the `test` task to be finalized by the `codeCoverageReport` task")
+                void shouldSetTheTestTaskToBeFinalizedByTheCodeCoverageReportTask() {
+                    var finalizedBy = findTaskByPath(rootProject, getRootProjectPath(TEST)).getFinalizedBy().getDependencies(null);
+                    assertThat(finalizedBy).hasAtLeastOneElementOfType(CodeCoverageReportTask.class);
+                }
+
+                @Test
+                @DisplayName("Should set the `check` task to depend on the `codeCoverageReport` task")
+                void shouldSetTheCheckTaskToDependOnTheCodeCoverageReportTask() {
+                    var dependsOn = findTaskByPath(rootProject, getRootProjectPath(CHECK)).getDependsOn();
+                    assertThat(dependsOn).hasAtLeastOneElementOfType(CodeCoverageReportTask.class);
+                }
+
+                @Test
+                @DisplayName("Should enable html reports")
+                void shouldEnableHtmlReports() {
+                    rootProject.getTasks().withType(CodeCoverageReportTask.class, task -> assertThat(task.getReports().getHtml().isEnabled()).isTrue());
+                }
+
+                @Test
+                @DisplayName("Should enable xml reports")
+                void shouldEnableXmlReports() {
+                    rootProject.getTasks().withType(CodeCoverageReportTask.class, task -> assertThat(task.getReports().getXml().isEnabled()).isTrue());
+                }
             }
 
-            @Test
-            @DisplayName("Should set the `check` task to depend on the `codeCoverageReport` task")
-            void shouldSetTheCheckTaskToDependOnTheCodeCoverageReportTask() {
-                var dependsOn = findTaskByPath(rootProject, getRootProjectPath(CHECK)).getDependsOn();
-                assertThat(dependsOn).hasAtLeastOneElementOfType(CodeCoverageReportTask.class);
-            }
+            @DisplayName("JacocoTestReport Tests")
+            @Nested
+            class JacocoTestReportTests {
 
-            @Test
-            @DisplayName("Should enable html reports")
-            void shouldEnableHtmlReports() {
-                rootProject.getTasks().withType(CodeCoverageReportTask.class, task -> assertThat(task.getReports().getHtml().isEnabled()).isTrue());
-            }
+                @Test
+                @DisplayName("Should set the `test` task to be finalized by the `jacocoTestReport` task")
+                void shouldSetTheTestTaskToBeFinalizedByTheJacocoTestReportTask() {
+                    var finalizedBy = findTaskByPath(rootProject, getRootProjectPath(TEST)).getFinalizedBy().getDependencies(null);
+                    assertThat(finalizedBy).extracting("identity.name").contains(JACOCO_TEST_REPORT);
+                }
 
-            @Test
-            @DisplayName("Should enable xml reports")
-            void shouldEnableXmlReports() {
-                rootProject.getTasks().withType(CodeCoverageReportTask.class, task -> assertThat(task.getReports().getXml().isEnabled()).isTrue());
+                @Test
+                @DisplayName("Should set the `check` task to depend on the `jacocoTestReport` task")
+                void shouldSetTheCheckTaskToDependOnTheJacocoTestReportTask() {
+                    var dependsOn = findTaskByPath(rootProject, getRootProjectPath(CHECK)).getDependsOn();
+                    assertThat(dependsOn).extracting("identity.name").contains(JACOCO_TEST_REPORT);
+                }
+
+                @Test
+                @DisplayName("Should set the `jacocoTestReport` task to depend on the root project `test` task")
+                void shouldSetTheJacocoTestReportTaskToDependOnTheRootProjectTestTask() {
+                    var dependsOn = findTaskByPath(rootProject, getRootProjectPath(JACOCO_TEST_REPORT)).getDependsOn();
+                    assertThat(dependsOn).contains(rootProject.getTasks().findByPath(getRootProjectPath(TEST)));
+                }
+
+                @Test
+                @DisplayName("Should enable html reports")
+                void shouldEnableHtmlReports() {
+                    var task = (JacocoReport) findTaskByPath(rootProject, getRootProjectPath(JACOCO_TEST_REPORT));
+                   assertThat(task.getReports().getHtml().isEnabled()).isTrue();
+                }
+
+                @Test
+                @DisplayName("Should enable xml reports")
+                void shouldEnableXmlReports() {
+                    var task = (JacocoReport) findTaskByPath(rootProject, getRootProjectPath(JACOCO_TEST_REPORT));
+                    assertThat(task.getReports().getXml().isEnabled()).isTrue();                }
             }
         }
 

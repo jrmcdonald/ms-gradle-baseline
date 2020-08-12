@@ -19,10 +19,14 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
+import static java.lang.String.join;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 class SonarQubePluginManagerTest extends AbstractPluginManagerTest {
+
+    private static final String CODE_COVERAGE_REPORT_PATH = "%s/reports/jacoco/codeCoverageReport/codeCoverageReport.xml";
+    private static final String JACOCO_TEST_REPORT_PATH = "%s/reports/jacoco/test/jacocoTestReport.xml";
 
     SonarQubePluginManager manager;
     Project rootProject;
@@ -44,6 +48,7 @@ class SonarQubePluginManagerTest extends AbstractPluginManagerTest {
     @DisplayName("Apply Tests")
     @Nested
     class ApplyTests {
+
         @DisplayName("All Project Test")
         @Nested
         class AllProjectTest {
@@ -84,9 +89,13 @@ class SonarQubePluginManagerTest extends AbstractPluginManagerTest {
             @Test
             @DisplayName("Should configure the `xmlReportPaths` property")
             void shouldConfigureTheXmlReportPathsProperty() {
-                rootProject.getTasks().withType(SonarQubeTask.class, task -> assertThat(task.getProperties()).containsEntry("sonar.coverage.jacoco.xmlReportPaths",
-                                                                                                                            format("%s/reports/jacoco/codeCoverageReport/codeCoverageReport.xml",
-                                                                                                                                   rootProject.getBuildDir().toPath())));
+                var expectedCodeCoverageReportPath = format(CODE_COVERAGE_REPORT_PATH, rootProject.getBuildDir().toPath());
+                var expectedJacocoTestReportPath = format(JACOCO_TEST_REPORT_PATH, rootProject.getBuildDir().toPath());
+
+                rootProject.getTasks()
+                           .withType(SonarQubeTask.class,
+                                     task -> assertThat(task.getProperties()).containsEntry("sonar.coverage.jacoco.xmlReportPaths",
+                                                                                                                 join(",", expectedCodeCoverageReportPath, expectedJacocoTestReportPath)));
             }
         }
 
