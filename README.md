@@ -87,9 +87,16 @@ spotbugsMain {
 
 ### Jacoco Plugin
 
-Check code coverage using the [Jacoco Plugin](https://www.eclemma.org/jacoco/).
+Check code coverage using the [Jacoco Plugin](https://www.eclemma.org/jacoco/). The standard jacocoTestReport task is configured for the the root gradle project. A new codeCoverageReport task is configured to aggregate coverage from all sub projects (as described in the [Gradle Docs](https://docs.gradle.org/6.4-rc-1/samples/sample_jvm_multi_project_with_code_coverage.html)).
 
 ```groovy
+jacocoTestReport {
+    reports {
+        html.enabled true
+        xml.enabled true
+    }
+}
+
 tasks.register("codeCoverageReport", JacocoReport) {
     subprojects { subproject ->
         subproject.plugins.withType(JacocoPlugin).configureEach {
@@ -109,7 +116,9 @@ tasks.register("codeCoverageReport", JacocoReport) {
     }
 }
 test.finalizedBy codeCoverageReport
+test.finalizedBy jacocoTestReport
 check.dependsOn codeCoverageReport
+check.dependsOn jacocoTestReport
 ```
 
 ### Spring Boot Plugin
