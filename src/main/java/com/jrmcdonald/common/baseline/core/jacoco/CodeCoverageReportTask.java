@@ -14,6 +14,9 @@ public class CodeCoverageReportTask extends JacocoReport {
     public static final String NAME = "codeCoverageReport";
 
     public CodeCoverageReportTask() {
+        setGroup("Verification");
+        setDescription("Generates an aggregate code coverage report for all subproject test tasks.");
+
         init(getProject());
     }
 

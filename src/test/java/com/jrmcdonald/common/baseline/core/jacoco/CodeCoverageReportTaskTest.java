@@ -43,6 +43,18 @@ class CodeCoverageReportTaskTest {
         subProject.getTasks().getByName("jacocoTestReport");
     }
 
+    @Test
+    @DisplayName("Should set group")
+    void shouldSetGroup() {
+        rootProject.getTasks().withType(CodeCoverageReportTask.class, task -> assertThat(task.getGroup()).isEqualTo("Verification"));
+    }
+
+    @Test
+    @DisplayName("Should set description")
+    void shouldSetDescription() {
+        rootProject.getTasks().withType(CodeCoverageReportTask.class, task -> assertThat(task.getDescription()).isEqualTo("Generates an aggregate code coverage report for all subproject test tasks."));
+    }
+
 
     @Test
     @DisplayName("Should not configure source sets for intermediate project")
