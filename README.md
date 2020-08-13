@@ -14,8 +14,7 @@ A gradle plugin to apply a common baseline of plugins to a java project.
 | Test convorage with [Jacoco](#jacoco-plugin)                                   | 👍          |
 | Spring Boot features via [Spring Boot](#spring-boot-plugin)                    | 👍          |
 | Git Hook configuration via [GitHooks](#githooks-plugin)                        | 👍          |
-| Configure third party maven repositories                                       | ⬜          |
-| Setup common reusable gradle configurations                                    | ⬜          |
+| Setup common platform configuration [Common Platform](#common-platform)        | 👍          |
 | Configure gradle to use JUnit 5                                                | ⬜          |
 | Configure Java compiler options                                                | ⬜          |
 | Configure IDE settings (code style/editorconfig)                               | ⬜          |
@@ -140,3 +139,29 @@ tasks.sonarqube.mustRunAfter codeCoverageReport
 ### GitHooks Plugin
 
 Apply version controlled git hooks using the [ghooks plugin](https://github.com/gtramontina/ghooks.gradle).
+
+## Configuration
+
+### Common Platform
+
+Define a new configuration that is extended by the main java configurations making it easier to apply a platform to multiple configurations.
+
+```groovy
+configurations {
+    commonPlatform
+    compileOnly.extendsFrom(commonPlatform)
+    annotationProcessor.extendsFrom(commonPlatform)
+    testCompileOnly.extendsFrom(commonPlatform)
+    testAnnotationProcessor.extendsFrom(commonPlatform)
+    implementation.extendsFrom(commonPlatform)
+    testFixturesImplementation.extendsFrom(commonPlatform)
+}
+```
+
+Which can be used as:
+
+```groovy
+dependencies {
+    commonPlatform enforcedPlatform(group: 'org.springframework.boot', name: 'spring-boot-dependencies', version: '2.3.2.RELEASE')
+}
+```

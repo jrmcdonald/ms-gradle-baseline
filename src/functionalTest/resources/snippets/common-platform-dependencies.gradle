@@ -1,0 +1,3 @@
+dependencies {
+    commonPlatform enforcedPlatform(group: 'org.springframework.boot', name: 'spring-boot-dependencies', version: '2.3.2.RELEASE')
+}

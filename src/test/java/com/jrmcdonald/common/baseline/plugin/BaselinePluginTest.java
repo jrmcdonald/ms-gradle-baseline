@@ -1,6 +1,7 @@
 package com.jrmcdonald.common.baseline.plugin;
 
 import com.jrmcdonald.common.baseline.exception.InvalidProjectTargetException;
+import com.jrmcdonald.common.baseline.manager.config.ConfigManager;
 import com.jrmcdonald.common.baseline.manager.plugin.PluginManager;
 
 import org.gradle.api.Project;
@@ -17,7 +18,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 
@@ -25,7 +26,10 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 class BaselinePluginTest {
 
     @Mock
-    private PluginManager manager;
+    private PluginManager pluginManager;
+
+    @Mock
+    private ConfigManager configManager;
 
     private BaselinePlugin plugin;
 
@@ -35,7 +39,8 @@ class BaselinePluginTest {
     @BeforeEach
     void beforeEach() {
         plugin = new BaselinePlugin();
-        plugin.setManagers(List.of(manager));
+        plugin.setPluginManagers(List.of(pluginManager));
+        plugin.setConfigManagers(List.of(configManager));
 
         rootProject = ProjectBuilder.builder().withName("rootProject").build();
         subProject = ProjectBuilder.builder().withName("subProject").withParent(rootProject).build();
@@ -43,23 +48,26 @@ class BaselinePluginTest {
 
     @AfterEach
     void afterEach() {
-        verifyNoMoreInteractions(manager);
+        verifyNoMoreInteractions(pluginManager, configManager);
     }
 
     @Test
-    @DisplayName("Should execute manager")
-    void shouldCallApplyOnManager() {
+    @DisplayName("Should execute managers")
+    void shouldExecuteManagers() {
         plugin.apply(rootProject);
 
         // force afterEvaluate hook to be called
         rootProject.getTasksByName("tasks", false);
         subProject.getTasksByName("tasks", false);
 
-        verify(manager).apply(rootProject);
-        verify(manager).apply(subProject);
+        var inOrder = inOrder(pluginManager, configManager);
 
-        verify(manager).afterEvaluate(rootProject);
-        verify(manager).afterEvaluate(subProject);
+        inOrder.verify(pluginManager).apply(rootProject);
+        inOrder.verify(pluginManager).apply(subProject);
+        inOrder.verify(configManager).apply(rootProject);
+        inOrder.verify(configManager).apply(subProject);
+        inOrder.verify(pluginManager).afterEvaluate(rootProject);
+        inOrder.verify(pluginManager).afterEvaluate(subProject);
     }
 
     @Test

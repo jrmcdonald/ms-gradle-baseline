@@ -1,6 +1,8 @@
 package com.jrmcdonald.common.baseline.plugin;
 
 import com.jrmcdonald.common.baseline.exception.InvalidProjectTargetException;
+import com.jrmcdonald.common.baseline.manager.config.ConfigManager;
+import com.jrmcdonald.common.baseline.manager.config.ConfigurationsConfigManager;
 import com.jrmcdonald.common.baseline.manager.plugin.DependencyCheckPluginManager;
 import com.jrmcdonald.common.baseline.manager.plugin.GitHooksPluginManager;
 import com.jrmcdonald.common.baseline.manager.plugin.JacocoPluginManager;
@@ -20,16 +22,21 @@ import lombok.Setter;
 public class BaselinePlugin implements Plugin<Project> {
 
     @Setter
-    private List<PluginManager> managers;
+    private List<PluginManager> pluginManagers;
+
+    @Setter
+    private List<ConfigManager> configManagers;
 
     public BaselinePlugin() {
-        managers = List.of(new DependencyCheckPluginManager(),
-                           new GitHooksPluginManager(),
-                           new JacocoPluginManager(),
-                           new SonarQubePluginManager(),
-                           new SpotBugsPluginManager(),
-                           new SpringBootPluginManager(),
-                           new VersionsPluginManager());
+        pluginManagers = List.of(new DependencyCheckPluginManager(),
+                                 new GitHooksPluginManager(),
+                                 new JacocoPluginManager(),
+                                 new SonarQubePluginManager(),
+                                 new SpotBugsPluginManager(),
+                                 new SpringBootPluginManager(),
+                                 new VersionsPluginManager());
+
+        configManagers = List.of(new ConfigurationsConfigManager());
     }
 
     @Override
@@ -39,16 +46,20 @@ public class BaselinePlugin implements Plugin<Project> {
             throw new InvalidProjectTargetException("com.jrmcdonald.common.baseline should be applied to the root project only");
         }
 
-        rootProject.allprojects(this::applyManagers);
-        rootProject.allprojects(this::afterEvaluateManagers);
+        rootProject.allprojects(this::applyPluginManagers);
+        rootProject.allprojects(this::applyConfigManagers);
+
+        rootProject.allprojects(this::afterEvaluatePluginManagers);
     }
 
-    private void applyManagers(Project project) {
-        managers.forEach(manager -> manager.apply(project));
+    private void applyPluginManagers(Project project) {
+        pluginManagers.forEach(manager -> manager.apply(project));
     }
 
-    private void afterEvaluateManagers(Project project) {
-        project.afterEvaluate(p -> managers.forEach(manager -> manager.afterEvaluate(p)));
+    private void afterEvaluatePluginManagers(Project project) {
+        project.afterEvaluate(p -> pluginManagers.forEach(manager -> manager.afterEvaluate(p)));
     }
+
+    private void applyConfigManagers(Project project) { configManagers.forEach(configManager -> configManager.apply(project)); }
 
 }
