@@ -19,15 +19,8 @@ apply from: "${rootDir}/gradle/publishing.gradle"
 apply from: "${rootDir}/gradle/functional-test.gradle"
 
 configurations {
-    commonPlatform
-    compileOnly.extendsFrom(commonPlatform)
-    annotationProcessor.extendsFrom(commonPlatform)
-    testCompileOnly.extendsFrom(commonPlatform)
-    testAnnotationProcessor.extendsFrom(commonPlatform)
     functionalTestCompileOnly.extendsFrom(commonPlatform)
     functionalTestAnnotationProcessor.extendsFrom(commonPlatform)
-    implementation.extendsFrom(commonPlatform)
-    testFixturesImplementation.extendsFrom(commonPlatform)
 }
 
 dependencies {
