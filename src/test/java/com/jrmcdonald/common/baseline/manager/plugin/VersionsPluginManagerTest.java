@@ -1,4 +1,4 @@
-package com.jrmcdonald.common.baseline.manager;
+package com.jrmcdonald.common.baseline.manager.plugin;
 
 import com.github.benmanes.gradle.versions.VersionsPlugin;
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask;

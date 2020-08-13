@@ -1,4 +1,4 @@
-package com.jrmcdonald.common.baseline.manager;
+package com.jrmcdonald.common.baseline.manager.plugin;
 
 import com.github.spotbugs.snom.SpotBugsPlugin;
 import com.github.spotbugs.snom.SpotBugsReport;
