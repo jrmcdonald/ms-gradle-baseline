@@ -137,32 +137,6 @@ class ConfigurationsConfigManagerTest {
 
     }
 
-    @DisplayName("Non Root Project Tests")
-    @Nested
-    class NonRootProjectTests {
-
-        Project subProject;
-
-        @BeforeEach
-        void beforeEach() {
-            var manager = new ConfigurationsConfigManager();
-
-            rootProject = ProjectBuilder.builder().withName("rootProject").build();
-            subProject = ProjectBuilder.builder().withName("subProject").withParent(rootProject).build();
-
-            manager.apply(subProject);
-        }
-
-        @Test
-        @DisplayName("Should define `commonPlatform` configuration")
-        void shouldDefineCommonPlatformConfiguration() {
-            var configurations = subProject.getConfigurations();
-            assertThatThrownBy(() -> configurations.getByName(COMMON_PLATFORM_CONFIGURATION)).isInstanceOf(UnknownConfigurationException.class)
-                                                                                          .hasMessage("Configuration with name 'commonPlatform' not found.");
-        }
-
-    }
-
     private void validateConfigurationExtendsFromParentConfiguration(Project project, String configurationName, String parentConfigurationName) {
         var parentConfiguration = Objects.requireNonNull(project.getConfigurations().getByName(parentConfigurationName));
         var configuration = Objects.requireNonNull(project.getConfigurations().getByName(configurationName));
