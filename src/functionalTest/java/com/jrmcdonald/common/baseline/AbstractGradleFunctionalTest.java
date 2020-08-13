@@ -16,12 +16,26 @@ import javax.annotation.Nonnull;
 
 import lombok.SneakyThrows;
 
+import static java.lang.String.format;
+
 public abstract class AbstractGradleFunctionalTest {
 
-    protected static final String SETTINGS_GRADLE = "settings.gradle";
+    // File Names
     protected static final String BUILD_GRADLE = "build.gradle";
-    private static final String SETTINGS_TEMPLATE_FILE = "src/functionalTest/resources/settings.gradle";
-    private static final String GRADLE_TEMPLATE_FILE = "src/functionalTest/resources/build.gradle";
+    private static final String SETTINGS_GRADLE = "settings.gradle";
+
+    // Directories
+    private static final String SOURCE_RESOURCES_DIR = "src/functionalTest/resources";
+    private static final String SOURCE_SNIPPETS_DIR = format("%s/snippets", SOURCE_RESOURCES_DIR);
+    private static final String SOURCE_CODE_DIR = format("%s/code", SOURCE_RESOURCES_DIR);
+
+    // Files
+    private static final String SETTINGS_TEMPLATE_FILE = format("%s/%s", SOURCE_RESOURCES_DIR, SETTINGS_GRADLE);
+    private static final String GRADLE_TEMPLATE_FILE = format("%s/%s", SOURCE_RESOURCES_DIR, BUILD_GRADLE);
+    protected static final String DEPENDENCIES_FILE = format("%s/dependencies.gradle", SOURCE_SNIPPETS_DIR);
+    protected static final String APPLICATION_FILE = format("%s/Application.java", SOURCE_CODE_DIR);
+    protected static final String APPLICATION_TEST_FILE = format("%s/ApplicationTest.java", SOURCE_CODE_DIR);
+
     protected static final String BUILD_SUCCESSFUL = "BUILD SUCCESSFUL";
 
     @TempDir
@@ -77,8 +91,11 @@ public abstract class AbstractGradleFunctionalTest {
     }
 
     @SneakyThrows
-    private void copyToProject(@Nonnull String source, @Nonnull String destination) {
-        Files.write(new File(projectDir, destination).toPath(), Files.readAllBytes(Paths.get(source)));
+    protected void copyToProject(@Nonnull String source, @Nonnull String destination) {
+        var destinationPath = new File(projectDir, destination).toPath();
+
+        Files.createDirectories(destinationPath.getParent());
+        Files.write(destinationPath, Files.readAllBytes(Paths.get(source)));
     }
 
     @SneakyThrows

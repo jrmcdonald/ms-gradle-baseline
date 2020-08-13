@@ -12,7 +12,7 @@ public class ConfigurationsConfigManagerFunctionalTest extends AbstractGradleFun
     @Test
     @DisplayName("Can use `commonPlatform` configuration")
     void canUseCommonPlatformConfiguration() {
-            appendToProject("src/functionalTest/resources/snippets/common-platform-dependencies.gradle", BUILD_GRADLE);
+            appendToProject(DEPENDENCIES_FILE, BUILD_GRADLE);
 
             var result = build("build", "-m");
 

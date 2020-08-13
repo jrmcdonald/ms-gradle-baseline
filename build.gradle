@@ -59,3 +59,9 @@ jar {
 tasks.withType(Test) {
     useJUnitPlatform()
 }
+
+sonarqube {
+    properties {
+        property "sonar.exclusions", "**/functionalTest/resources/code/*.java"
+    }
+}

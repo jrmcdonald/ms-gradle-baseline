@@ -15,7 +15,7 @@ A gradle plugin to apply a common baseline of plugins to a java project.
 | Spring Boot features via [Spring Boot](#spring-boot-plugin)                    | 👍          |
 | Git Hook configuration via [GitHooks](#githooks-plugin)                        | 👍          |
 | Setup common platform configuration [Common Platform](#common-platform)        | 👍          |
-| Configure gradle to use JUnit 5                                                | ⬜          |
+| Configure gradle to use JUnit 5 [JUnit 5](#junit-5)                            | 👍          |
 | Configure Java compiler options                                                | ⬜          |
 | Configure IDE settings (code style/editorconfig)                               | ⬜          |
 
@@ -163,5 +163,15 @@ Which can be used as:
 ```groovy
 dependencies {
     commonPlatform enforcedPlatform(group: 'org.springframework.boot', name: 'spring-boot-dependencies', version: '2.3.2.RELEASE')
+}
+```
+
+## JUnit 5
+
+Configure gradle to use JUnit5 for tests.
+
+```groovy
+test {
+    useJUnitPlatform()
 }
 ```
