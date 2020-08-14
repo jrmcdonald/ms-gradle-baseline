@@ -2,6 +2,7 @@ package com.jrmcdonald.common.baseline.plugin;
 
 import com.jrmcdonald.common.baseline.exception.InvalidProjectTargetException;
 import com.jrmcdonald.common.baseline.manager.config.ConfigManager;
+import com.jrmcdonald.common.baseline.manager.config.DependencyInsightConfigManager;
 import com.jrmcdonald.common.baseline.manager.config.GradleConfigManager;
 import com.jrmcdonald.common.baseline.manager.config.JavaCompileConfigManager;
 import com.jrmcdonald.common.baseline.manager.config.JunitConfigManager;
@@ -38,9 +39,10 @@ public class BaselinePlugin implements Plugin<Project> {
                                  new SpringBootPluginManager(),
                                  new VersionsPluginManager());
 
-        configManagers = List.of(new GradleConfigManager(),
-                                 new JunitConfigManager(),
-                                 new JavaCompileConfigManager());
+        configManagers = List.of(new DependencyInsightConfigManager(),
+                                 new GradleConfigManager(),
+                                 new JavaCompileConfigManager(),
+                                 new JunitConfigManager());
     }
 
     @Override
