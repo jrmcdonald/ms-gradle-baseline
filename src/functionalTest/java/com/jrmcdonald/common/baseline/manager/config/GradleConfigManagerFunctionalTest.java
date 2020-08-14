@@ -7,12 +7,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ConfigurationsConfigManagerFunctionalTest extends AbstractGradleFunctionalTest {
+public class GradleConfigManagerFunctionalTest extends AbstractGradleFunctionalTest {
 
     @Test
     @DisplayName("Can use `commonPlatform` configuration")
     void canUseCommonPlatformConfiguration() {
-            appendToProject("src/functionalTest/resources/snippets/common-platform-dependencies.gradle", BUILD_GRADLE);
+            appendToProject(DEPENDENCIES_FILE, BUILD_GRADLE);
 
             var result = build("build", "-m");
 

@@ -19,15 +19,8 @@ apply from: "${rootDir}/gradle/publishing.gradle"
 apply from: "${rootDir}/gradle/functional-test.gradle"
 
 configurations {
-    commonPlatform
-    compileOnly.extendsFrom(commonPlatform)
-    annotationProcessor.extendsFrom(commonPlatform)
-    testCompileOnly.extendsFrom(commonPlatform)
-    testAnnotationProcessor.extendsFrom(commonPlatform)
     functionalTestCompileOnly.extendsFrom(commonPlatform)
     functionalTestAnnotationProcessor.extendsFrom(commonPlatform)
-    implementation.extendsFrom(commonPlatform)
-    testFixturesImplementation.extendsFrom(commonPlatform)
 }
 
 dependencies {
@@ -35,6 +28,8 @@ dependencies {
 
     compileOnly group: 'org.projectlombok', name: 'lombok'
     annotationProcessor group: 'org.projectlombok', name: 'lombok'
+
+    implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: "${spotbugsAnnotationsVersion}"
 
     // Plugin Dependencies
     implementation group: 'gradle.plugin.com.github.spotbugs.snom', name: 'spotbugs-gradle-plugin', version: "${spotbugsPluginVersion}"
@@ -65,4 +60,10 @@ jar {
 
 tasks.withType(Test) {
     useJUnitPlatform()
+}
+
+sonarqube {
+    properties {
+        property "sonar.exclusions", "**/functionalTest/resources/code/*.java"
+    }
 }

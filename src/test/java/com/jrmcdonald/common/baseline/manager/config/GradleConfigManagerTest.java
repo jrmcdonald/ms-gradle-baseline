@@ -16,11 +16,11 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.util.List;
 import java.util.Objects;
 
-import static com.jrmcdonald.common.baseline.manager.config.ConfigurationsConfigManager.COMMON_PLATFORM_CONFIGURATION;
+import static com.jrmcdonald.common.baseline.manager.config.GradleConfigManager.COMMON_PLATFORM_CONFIGURATION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class ConfigurationsConfigManagerTest {
+class GradleConfigManagerTest {
 
     private Project rootProject;
     private Project subProject;
@@ -31,7 +31,7 @@ class ConfigurationsConfigManagerTest {
 
         @BeforeEach
         void beforeEach() {
-            var manager = new ConfigurationsConfigManager();
+            var manager = new GradleConfigManager();
 
             rootProject = ProjectBuilder.builder().withName("rootProject").build();
             rootProject.getPlugins().apply(JavaPlugin.class);
@@ -64,7 +64,7 @@ class ConfigurationsConfigManagerTest {
 
         @BeforeEach
         void beforeEach() {
-            var manager = new ConfigurationsConfigManager();
+            var manager = new GradleConfigManager();
 
             rootProject = ProjectBuilder.builder().withName("rootProject").build();
             rootProject.getPlugins().apply(JavaLibraryPlugin.class);
@@ -91,7 +91,7 @@ class ConfigurationsConfigManagerTest {
 
         @BeforeEach
         void beforeEach() {
-            var manager = new ConfigurationsConfigManager();
+            var manager = new GradleConfigManager();
 
             rootProject = ProjectBuilder.builder().withName("rootProject").build();
             rootProject.getPlugins().apply(JavaPlugin.class);
@@ -120,7 +120,7 @@ class ConfigurationsConfigManagerTest {
 
         @BeforeEach
         void beforeEach() {
-            var manager = new ConfigurationsConfigManager();
+            var manager = new GradleConfigManager();
 
             rootProject = ProjectBuilder.builder().withName("rootProject").build();
 
@@ -133,32 +133,6 @@ class ConfigurationsConfigManagerTest {
             var configurations = rootProject.getConfigurations();
             assertThatThrownBy(() -> configurations.getByName(COMMON_PLATFORM_CONFIGURATION)).isInstanceOf(UnknownConfigurationException.class)
                                                                                 .hasMessage("Configuration with name 'commonPlatform' not found.");
-        }
-
-    }
-
-    @DisplayName("Non Root Project Tests")
-    @Nested
-    class NonRootProjectTests {
-
-        Project subProject;
-
-        @BeforeEach
-        void beforeEach() {
-            var manager = new ConfigurationsConfigManager();
-
-            rootProject = ProjectBuilder.builder().withName("rootProject").build();
-            subProject = ProjectBuilder.builder().withName("subProject").withParent(rootProject).build();
-
-            manager.apply(subProject);
-        }
-
-        @Test
-        @DisplayName("Should define `commonPlatform` configuration")
-        void shouldDefineCommonPlatformConfiguration() {
-            var configurations = subProject.getConfigurations();
-            assertThatThrownBy(() -> configurations.getByName(COMMON_PLATFORM_CONFIGURATION)).isInstanceOf(UnknownConfigurationException.class)
-                                                                                          .hasMessage("Configuration with name 'commonPlatform' not found.");
         }
 
     }
