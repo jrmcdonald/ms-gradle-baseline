@@ -29,6 +29,8 @@ dependencies {
     compileOnly group: 'org.projectlombok', name: 'lombok'
     annotationProcessor group: 'org.projectlombok', name: 'lombok'
 
+    implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: "${spotbugsAnnotationsVersion}"
+
     // Plugin Dependencies
     implementation group: 'gradle.plugin.com.github.spotbugs.snom', name: 'spotbugs-gradle-plugin', version: "${spotbugsPluginVersion}"
     implementation group: 'gradle.plugin.com.gtramontina.ghooks.gradle', name: 'ghooks.gradle', version: "${ghooksPluginVersion}"
