@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ConfigurationsConfigManagerFunctionalTest extends AbstractGradleFunctionalTest {
+public class GradleConfigManagerFunctionalTest extends AbstractGradleFunctionalTest {
 
     @Test
     @DisplayName("Can use `commonPlatform` configuration")

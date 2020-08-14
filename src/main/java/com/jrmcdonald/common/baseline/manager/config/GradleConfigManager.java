@@ -6,7 +6,7 @@ import org.gradle.api.plugins.JavaPlugin;
 
 import java.util.Set;
 
-public class ConfigurationsConfigManager implements ConfigManager {
+public class GradleConfigManager implements ConfigManager {
 
     public static final String COMMON_PLATFORM_CONFIGURATION = "commonPlatform";
 
