@@ -11,12 +11,12 @@ A gradle plugin to apply a common baseline of plugins to a java project.
 | Dependency version checking via [Gradle Versions](#dependencyupdates-plugin)   | 👍          |
 | OWASP CVE checking via [Dependency-Check](#dependencycheck-plugin)             | 👍          |
 | Static analysis with [Spotbugs](#spotbugs-plugin)                              | 👍          |
-| Test convorage with [Jacoco](#jacoco-plugin)                                   | 👍          |
+| Test coverage with [Jacoco](#jacoco-plugin)                                   | 👍          |
 | Spring Boot features via [Spring Boot](#spring-boot-plugin)                    | 👍          |
 | Git Hook configuration via [GitHooks](#githooks-plugin)                        | 👍          |
 | Setup common platform configuration [Common Platform](#common-platform)        | 👍          |
 | Configure gradle to use JUnit 5 [JUnit 5](#junit-5)                            | 👍          |
-| Configure Java compiler options                                                | ⬜          |
+| Configure Java compiler options [Java Compile](#java-compile)                  | 👍          |
 | Configure IDE settings (code style/editorconfig)                               | ⬜          |
 
 ## Usage
@@ -166,12 +166,25 @@ dependencies {
 }
 ```
 
-## JUnit 5
+### JUnit 5
 
 Configure gradle to use JUnit5 for tests.
 
 ```groovy
 test {
     useJUnitPlatform()
+}
+```
+
+### Java Compile
+
+Configure java compilation options.
+
+```groovy
+compileJava {
+    options.compilerArgs << "-Werror"
+    options.compilerArgs << "-Xlint:all"
+    options.compilerArgs << "-Xlint:-try"
+    options.compilerArgs << "-Xlint:-processing"
 }
 ```
