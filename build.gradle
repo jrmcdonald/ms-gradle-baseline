@@ -38,6 +38,8 @@ dependencies {
     implementation group: 'org.owasp', name: 'dependency-check-gradle', version: "${dependencyCheckPluginVersion}"
     implementation group: 'org.sonarsource.scanner.gradle', name: 'sonarqube-gradle-plugin', version: "${sonarqubePluginVersion}"
     implementation group: 'org.springframework.boot', name: 'spring-boot-gradle-plugin', version: "${springbootPluginVersion}"
+    implementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: "1.5.1"
+
 
     testCompileOnly group: 'org.projectlombok', name: 'lombok'
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
