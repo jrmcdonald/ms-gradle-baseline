@@ -39,6 +39,17 @@ jobs:
       - run: |
           git fetch --no-tags --prune --depth=1 origin main
 
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+          fetch-depth: 50
+      - run: |
+          git fetch --no-tags --prune --depth=1 origin main
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+
       - uses: actions/cache@v2
         with:
           path: |
@@ -58,11 +69,11 @@ jobs:
         with:
           node-version: '12.x'
 
-      - name: Yarn Install
-        run: yarn install --frozen-lockfile
+      - name: Yarn
+        run: yarn --immutable
 
       - name: Yarn Audit
-        uses: jrmcdonald/yarn-audit-action@v1.1
+        run: npx audit-ci --moderate
 
       - name: Validate Gradle Wrapper
         uses: gradle/wrapper-validation-action@v1
