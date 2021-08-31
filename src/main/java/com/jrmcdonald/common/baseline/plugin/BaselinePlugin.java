@@ -36,7 +36,6 @@ public class BaselinePlugin implements Plugin<Project> {
                                  new JacocoPluginManager(),
                                  new SonarQubePluginManager(),
                                  new SpotBugsPluginManager(),
-                                 new SpringBootPluginManager(),
                                  new VersionsPluginManager());
 
         configManagers = List.of(new DependencyInsightConfigManager(),
