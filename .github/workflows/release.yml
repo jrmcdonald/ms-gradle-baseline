@@ -1,12 +1,9 @@
-name: build
+name: release
 
 on:
-  schedule:
-    - cron: '0 4 * * 1'
-  pull_request:
+  push:
     branches:
-      - '*'
-      - '*/*'
+      - 'main'
 
 env:
   slack-channel: 'status-ci-cd'
@@ -24,7 +21,7 @@ jobs:
         id: slack
         with:
           channel: ${{ env.slack-channel }}
-          status: BUILD STARTED
+          status: RELEASE STARTED
           color: warning
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
@@ -33,6 +30,10 @@ jobs:
         with:
           persist-credentials: false
           fetch-depth: 0
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
 
       - uses: actions/cache@v2
         with:
@@ -55,24 +56,22 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build
-        run: ./gradlew build --stacktrace
+        run: ./gradlew build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set PR Number
-        if: github.event_name == 'pull_request'
-        run: |
-          export PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-          echo "PR_NUMBER_OPT=-Dsonar.pullrequest.key=${PR_NUMBER}" >> $GITHUB_ENV
-
-      - name: Set Branch Name
-        if: github.event_name != 'pull_request'
+      - name: Sonar
         run: |
           export BRANCH_NAME=$(git branch --show-current)
-          echo "BRANCH_NAME_OPT=-Dsonar.branch.name=${BRANCH_NAME}" >> $GITHUB_ENV
+          ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_LOGIN }} -Dsonar.branch.name=${BRANCH_NAME} --info
 
-      - name: Sonar
-        run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_LOGIN }} ${BRANCH_NAME_OPT} ${PR_NUMBER_OPT} --info
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_TOKEN }}
+          GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
+          GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
+        run: |
+          ./gradlew release
 
       - uses: actions/upload-artifact@v1
         if: always()
@@ -86,7 +85,7 @@ jobs:
         with:
           message_id: ${{ steps.slack.outputs.message_id }}
           channel: ${{ env.slack-channel }}
-          status: BUILD SUCCESS
+          status: RELEASE SUCCESS
           color: good
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
@@ -97,7 +96,7 @@ jobs:
         with:
           message_id: ${{ steps.slack.outputs.message_id }}
           channel: ${{ env.slack-channel }}
-          status: BUILD FAILED
+          status: RELEASE FAILED
           color: danger
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
