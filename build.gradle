@@ -2,19 +2,17 @@ plugins {
     id 'java-gradle-plugin'
     id 'com.jrmcdonald.ms-gradle-baseline' version "${gradleBaselinePluginVerson}"
     id 'com.gradle.plugin-publish' version "${gradlePluginPublishPluginVersion}"
+    id 'de.gliderpilot.semantic-release' version "${gradleSemanticReleasePluginVersion}"
 }
 
 group = 'com.jrmcdonald'
-version = "${version}"
-
-ext['gradle.publish.key'] = System.getenv("GRADLE_PUBLISH_KEY")
-ext['gradle.publish.secret'] = System.getenv("GRADLE_PUBLISH_SECRET")
 
 repositories {
     mavenCentral()
     gradlePluginPortal()
 }
 
+apply from: "${rootDir}/gradle/credentials.gradle"
 apply from: "${rootDir}/gradle/publishing.gradle"
 apply from: "${rootDir}/gradle/functional-test.gradle"
 

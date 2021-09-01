@@ -30,13 +30,3 @@ out/
 
 ### VS Code ###
 .vscode/
-
-### Node ###
-node_modules/
-.yarn/*
-!.yarn/cache
-!.yarn/releases
-!.yarn/plugins
-!.yarn/sdks
-!.yarn/versions
-yarn-error.log

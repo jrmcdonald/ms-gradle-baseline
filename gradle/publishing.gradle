@@ -14,3 +14,13 @@ gradlePlugin {
         }
     }
 }
+
+semanticRelease {
+    releaseBranches {
+        include 'main'
+    }
+// TODO: update when https://github.com/tschulte/gradle-semantic-release-plugin/issues/46 is fixed
+//    repo {
+//        ghToken = project.ext.ghToken
+//    }
+}

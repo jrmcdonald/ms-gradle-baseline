@@ -1,0 +1,57 @@
+name: commitlint
+
+on:
+  pull_request:
+    branches:
+      - '*'
+      - '*/*'
+
+env:
+  slack-channel: 'status-ci-cd'
+
+jobs:
+  build:
+
+    if: contains(toJson(github.event.commits), '[skip ci]') == false
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Notify Slack Started
+        uses: voxmedia/github-action-slack-notify-build@v1
+        id: slack
+        with:
+          channel: ${{ env.slack-channel }}
+          status: LINT STARTED
+          color: warning
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Lint Commits
+        uses: wagoid/commitlint-github-action@v4
+
+      - name: Notify Slack Success
+        if: success()
+        uses: voxmedia/github-action-slack-notify-build@v1
+        with:
+          message_id: ${{ steps.slack.outputs.message_id }}
+          channel: ${{ env.slack-channel }}
+          status: LINT SUCCESS
+          color: good
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+      - name: Notify Slack Failed
+        if: failure()
+        uses: voxmedia/github-action-slack-notify-build@v1
+        with:
+          message_id: ${{ steps.slack.outputs.message_id }}
+          channel: ${{ env.slack-channel }}
+          status: LINT FAILED
+          color: danger
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
