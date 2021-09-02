@@ -12,7 +12,6 @@ import com.jrmcdonald.common.baseline.manager.plugin.JacocoPluginManager;
 import com.jrmcdonald.common.baseline.manager.plugin.PluginManager;
 import com.jrmcdonald.common.baseline.manager.plugin.SonarQubePluginManager;
 import com.jrmcdonald.common.baseline.manager.plugin.SpotBugsPluginManager;
-import com.jrmcdonald.common.baseline.manager.plugin.SpringBootPluginManager;
 import com.jrmcdonald.common.baseline.manager.plugin.VersionsPluginManager;
 
 import org.gradle.api.Plugin;
@@ -36,7 +35,6 @@ public class BaselinePlugin implements Plugin<Project> {
                                  new JacocoPluginManager(),
                                  new SonarQubePluginManager(),
                                  new SpotBugsPluginManager(),
-                                 new SpringBootPluginManager(),
                                  new VersionsPluginManager());
 
         configManagers = List.of(new DependencyInsightConfigManager(),
