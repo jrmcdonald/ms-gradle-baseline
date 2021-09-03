@@ -7,7 +7,6 @@ import com.jrmcdonald.common.baseline.manager.config.GradleConfigManager;
 import com.jrmcdonald.common.baseline.manager.config.JavaCompileConfigManager;
 import com.jrmcdonald.common.baseline.manager.config.JunitConfigManager;
 import com.jrmcdonald.common.baseline.manager.plugin.DependencyCheckPluginManager;
-import com.jrmcdonald.common.baseline.manager.plugin.GitHooksPluginManager;
 import com.jrmcdonald.common.baseline.manager.plugin.JacocoPluginManager;
 import com.jrmcdonald.common.baseline.manager.plugin.PluginManager;
 import com.jrmcdonald.common.baseline.manager.plugin.SonarQubePluginManager;
@@ -31,7 +30,6 @@ public class BaselinePlugin implements Plugin<Project> {
 
     public BaselinePlugin() {
         pluginManagers = List.of(new DependencyCheckPluginManager(),
-                                 new GitHooksPluginManager(),
                                  new JacocoPluginManager(),
                                  new SonarQubePluginManager(),
                                  new SpotBugsPluginManager(),

@@ -31,7 +31,6 @@ dependencies {
 
     // Plugin Dependencies
     implementation group: 'gradle.plugin.com.github.spotbugs.snom', name: 'spotbugs-gradle-plugin', version: "${spotbugsPluginVersion}"
-    implementation group: 'gradle.plugin.com.gtramontina.ghooks.gradle', name: 'ghooks.gradle', version: "${ghooksPluginVersion}"
     implementation group: 'com.github.ben-manes', name: 'gradle-versions-plugin', version: "${versionsPluginVersion}"
     implementation group: 'org.owasp', name: 'dependency-check-gradle', version: "${dependencyCheckPluginVersion}"
     implementation group: 'org.sonarsource.scanner.gradle', name: 'sonarqube-gradle-plugin', version: "${sonarqubePluginVersion}"
